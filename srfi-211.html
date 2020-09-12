@@ -47,6 +47,45 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       various extensions to <code>syntax-rules</code>.
     </p>
 
+    <h3>Example</h3>
+
+    <p>Let us assume that we want to write a library that exports the
+      macro <code>skip</code>.  The arguments of the <code>skip</code>
+      macro are a non-negative exact integer <em>n</em> and a number
+      of body forms.  A <code>skip</code> macro is evaluated by
+      dropping the first <em>n</em> n body forms and evaluating the
+      rest as a body.</p>
+
+    <p>Writing such a macro is not possible
+      with <code>syntax-rules</code>, but it is possible both
+      with <code>er-macro-transformer</code>
+      and <code>syntax-case</code>.  With the following code, the
+      library works on all implementations that support at
+      least <code>er-macro-transformer</code>
+      or <code>syntax-case</code>, and this SRFI, of course.</p>
+
+    <pre><small>    (define-library (skip)
+      (export skip)
+      (import (scheme base))
+      (cond-expand
+        ((library (srfi ### syntax-case))
+         (import (srfi ### syntax-case))
+         (begin
+           (define-syntax skip
+             (lambda (x)
+               (syntax-case x ()
+                 ((_ n b ...)
+                  (with-syntax (((b ...)
+                                 (list-tail (syntax->datum #'n) #'(b ...))))
+                    #'(letrec* () b ...))))))))
+        ((library (srfi ### er-macro-transformer))
+         (import (srfi ### er-macro-transformer))
+         (begin
+           (define-syntax skip
+             (er-macro-transformer
+              (lambda (e r c)
+                `(,(r 'letrec*) () ,@(list-tail (cddr e) (cadr e))))))))))</small></pre>
+
     <h2 id="specification">Specification</h2>
 
     <h3>Libraries</h3>
