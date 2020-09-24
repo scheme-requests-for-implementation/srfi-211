@@ -231,7 +231,7 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
 
     <p>The <code>with-ellipsis</code> special
       form <a href="https://www.gnu.org/software/guile/manual/html_node/Syntax-Case.html#Custom-Ellipsis-Identifiers-for-syntax_002dcase-Macros">documented
-      by Guile</a>, which allows to express <code>syntax-rules</code>
+      by GNU Guile</a>, which allows to express <code>syntax-rules</code>
       with
       its <a href="https://srfi.schemers.org/srfi-46/srfi-46.html">SRFI
       46</a> extensions in terms of <code>syntax-case</code>.
@@ -250,6 +250,23 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <ul>
       <li><code>define-syntax-parameter</code></li>
       <li><code>syntax-parameterize</code></li>
+    </ul>
+
+    <p><code>(srfi 211 sc-macro-transformer)</code></p>
+
+    <p>The <code>sc-macro-transformer</code>
+      facility <a href="https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/Syntactic-Closures.html#Syntactic-Closures">as
+	documented by MIT/GNU Scheme</a>.  Exports the identifiers</p>
+
+    <ul>
+      <li><code>sc-macro-transformer</code></li>
+      <li><code>rsc-macro-transformer</code></li>
+      <li><code>make-syntactic-closure</code></li>
+      <li><code>close-syntax</code></li>
+      <li><code>capture-syntactic-environment</code></li>
+      <li><code>identifier?</code></li>
+      <li><code>identifier=?</code></li>
+      <li><code>make-synthetic-identifier</code></li>
     </ul>
 
     <h2 id="implementation">Implementation</h2>
