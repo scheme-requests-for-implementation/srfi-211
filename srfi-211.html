@@ -53,7 +53,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>Various Scheme implementations define extensions to
       the <code>syntax-rules</code> macro facility that can be found
-      in <a href="https://small.r7rs.org/">R7RS</a>, for
+      in <a href="https://small.r7rs.org/">R<sup>7</sup>RS</a>, for
       example explicit renaming macros, <code>syntax-case</code>,
       identifier macros or variable transformers.  While different
       implementation of the same extension will usually be compatible,
@@ -118,6 +118,54 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       below.  If it provides a library, it has to provide it as a
       whole and not just a subset of it.</p>
 
+    <p><code>(srfi 211 r4rs)</code></p>
+
+    <p>The low-level macro facility as documented in the third section
+      of the appendix to
+      the <cite><a href="https://people.csail.mit.edu/jaffer/r4rs.pdf">R<sup>4</sup>RS</a></cite>.
+      Exports the identifiers</p>
+
+    <ul>
+      <li><code>syntax</code></li>
+      <li><code>unwrap-syntax</code></li>
+      <li><code>identifier?</code></li>
+      <li><code>free-identifier=?</code></li>
+      <li><code>bound-identifier=?</code></li>
+      <li><code>identifier-&gt;symbol</code></li>
+      <li><code>generate-identifier</code></li>
+      <li><code>construct-identifier</code></li>
+    </ul>
+
+    <p><i>Rationale:</i> Although this thirty-year-old low-level macro
+      facility is usually not mentioned when talking about macro
+      systems, it has the advantage that it is on the one hand simple
+      and abstract enough to serve as a common denominator between
+      Schemes that have explicit renaming macro transformers and
+      Schemes that have <code>syntax-case</code> and on the other hand
+      powerful enough so that it can define <code>syntax-rules</code>
+      as a macro.</p>
+
+    <p>In a certain sense, this macro facility
+      is <code>syntax-case</code> without <code>syntax-case</code>.</p>
+
+    <p>Compared to the <code>er-macro-transformer</code> facility,
+      which is quite comparable to this low-level macro facility, it
+      does not assume that abstract syntax objects are Scheme datums
+      but enforces the use of <code>unwrap-syntax</code>.  While this
+      can be no-op when implemented on top of explicit renaming macro
+      transformers, it is not in the case when implementated on top
+      of <code>syntax-case</code>.  Similarly, it does not assume that
+      identifiers that are <code>bound-identifier=?</code> are
+      already <code>eq?</code>.  These further abstractions make the
+      system compatible to the usual <code>syntax-case</code>
+      systems.</p>
+
+    <p>To the <code>er-macro-transformer</code> facility, it adds that
+      a macro transformer can also be given by procedure taking a
+      syntax object and returning a syntax object.  Thanks to the
+      abstract nature of a syntax object, this can be easily achieved
+      by implementations.</p>
+
     <p><code>(srfi 211 er-macro-transformer)</code></p>
 
     <p>The <code>er-macro-transformer</code> facility as documented by
@@ -135,8 +183,8 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p><code>(srfi 211 syntax-case)</code></p>
 
     <p>The <code>syntax-case</code> system as documented in
-      the <a href="http://www.r6rs.org">R6RS</a>.  Exports the
-      identifiers</p>
+      the <cite><a href="http://www.r6rs.org">R<sup>6</sup>RS</a></cite>.
+      Exports the identifiers</p>
 
     <ul>
       <li><code>syntax-case</code></li>
@@ -157,11 +205,11 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p><code>(srfi 211 identifier-syntax)</code></p>
 
     <p>The <code>identifier-syntax</code> transformer documented in
-      the R6RS.  If this library is present, a macro transformer will
-      be invoked if its associated keyword is referenced as an
-      expression.  The more general form
-      of <code>identifier-syntax</code> that permits the transformer to
-      determine what happens when <code>set!</code> is used may not
+      the <cite>R<sup>6</sup>RS</cite>.  If this library is present, a
+      macro transformer will be invoked if its associated keyword is
+      referenced as an expression.  The more general form
+      of <code>identifier-syntax</code> that permits the transformer
+      to determine what happens when <code>set!</code> is used may not
       be available unless the <code>(srfi 211
       variable-transformer)</code> library is present as well.
       Exports the identifier</p>
@@ -173,7 +221,7 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p><code>(srfi 211 variable-transformer)</code></p>
 
     <p>The <em>variable transformer</em> facility as documented in the
-    R6RS.  Exports the identifier</p>
+    <cite>R<sup>6</sup>RS</cite>.  Exports the identifier</p>
 
     <ul>
       <li><code>make-variable-transformer</code></li>
