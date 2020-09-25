@@ -181,6 +181,85 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>identifier?</code></li>
     </ul>
 
+    <p><i>Note 1:</i> Classically, to test whether binding one
+      identifier would also bind the other, the equivalence
+      predicate <code>eqv?</code> is used in the context of explicit
+      renaming macros.  In general, however, this equivalence
+      predicate is too fine as soon as the system is augmented with a
+      means to capture the syntactic environment of an identifier as
+      the following code shows:</p>
+
+    <pre><small>    (let ((x #f))
+      (let ((x #f)) ...))</small></pre>
+
+    <p>In the context of <code>...</code> binding one of the two
+      identifiers named <code>x</code> would certainly also bind the
+      other.  However, both identifiers cannot be equivalent because
+      the syntactic environment of the second is extended by the
+      binding of the first.</p>
+
+    <p>Consequently, macro programmers should
+      use <code>bound-identifier=?</code> instead of <code>eqv?</code>
+      whenever one of the library <code>(srfi 211 r4rs)</code>
+      or <code>(srfi 211 syntax-case)</code> is provided as well.</p>
+
+    <p><i>Note 2:</i> Classically, to implement non-hygienic macros,
+      raw symbols are inserted into the macro output in the context of
+      explicit renaming macros.  In general, however, this cannot lead
+      to robust macros as the following example shows:</p>
+
+    <pre><small>    (define-syntax loop
+      (er-macro-transformer
+        (lambda (x r c)
+          (let ((body (cdr x)))
+            `(,(r &apos;call-with-current-continuation)
+              (,(r &apos;lambda) (exit)
+               (,(r &apos;let) ,(r &apos;f) () ,@body (,(r &apos;f)))))))))
+
+    (define-syntax foo
+      (syntax-rules ()
+        ((foo x) (loop (exit x)))))
+
+    (foo 42)</small></pre>
+
+    <p>The macro writer may expect that the
+      expression <code>(foo)</code> evaluates to 42.  Instead, the
+      program will fail because the identifier <code>exit</code> in
+      the template of the <code>foo</code> macro is effectively renamed and
+      does not capture the binding of the identifier <code>exit</code>
+      introduced by the <code>loop</code> macro.</p>
+
+    <p>The following rewrite of <code>foo</code> will
+    solve <em>this</em> problem.</p>
+
+    <pre><small>    (define-syntax foo
+      (er-macro-transformer (x r c)
+        `(,(r loop) (exit ,(cadr x)))))</small></pre>
+
+    <p>This rewrite does not solve another problem, however.  The
+    expression</p>
+
+    <pre><small>    (let ((exit 42))
+      (foo exit))</small></pre>
+
+    <p>evaluates to the procedure <code>exit</code> introduced by
+      the <code>loop</code> macro, not to 42, which may have been
+      expected.  The real problem lies in the <code>loop</code> macro,
+      which should have renamed <code>exit</code> in the context of
+      the macro invoking it.</p>
+
+    <p>Consequentely, macro programmers should not insert raw symbols
+      in the macro output, but use <code>construct-identifier</code>
+      from <code>(srfi 211 r4rs)</code>
+      or <code>datum-&gt;syntax</code> from <code>(srfi 211
+      syntax-case)</code> when any of these two libraries is
+      provided as well.</p>
+
+    <p><i>Note 3:</i> It is generally an error if
+    the <code>rename</code> procedure is applied to a non-symbol.  It
+    is unspecified whether <code>er-macro-transformer</code> is bound
+    to a type of syntax or a (location holding a) procedure.</p>
+
     <p><code>(srfi 211 syntax-case)</code></p>
 
     <p>The <code>syntax-case</code> system as documented in
@@ -290,7 +369,7 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p>The <a href="https://www.unsyntax.org">Unsyntax implementation
         of the Scheme programming language</a> currently provides all
         of the above libraries except for <code>(srfi 211
-        sc-macro-transformer)</code></p>.
+        sc-macro-transformer)</code>.</p>
 
     <h2 id="acknowledgements">Acknowledgements</h2>
 
