@@ -169,7 +169,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       abstract nature of a syntax object, this can be easily achieved
       by implementations.</p>
 
-    <h4>The <code>er-macro-transformer</code> facility</h4>
+    <h4>Explicitly renaming macros</h4>
 
     <p><code>(srfi 211 er-macro-transformer)</code></p>
 
@@ -346,7 +346,19 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>syntax-parameterize</code></li>
     </ul>
 
-    <h4>The <code>sc-macro-transformer</code> facility</h4>
+    <h4>Implicitly renaming macros</h4>
+
+    <p><code>(srfi 211 ir-macro-transformer)</code></p>
+
+    <p>The <code>ir-macro-transformer</code>
+    facility <a href="https://wiki.call-cc.org/man/4/Macros#ir-macro-transformer">as
+        documented by CHICKEN</a>.  Exports the identifier</p>
+
+    <ul>
+      <li>ir-macro-transformer</li>
+    </ul>
+
+    <h4>Syntactic-closures macro transformers</h4>
 
     <p><code>(srfi 211 sc-macro-transformer)</code></p>
 
