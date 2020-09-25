@@ -210,7 +210,8 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p><i>Note 2:</i> Classically, to implement non-hygienic macros,
       raw symbols are inserted into the macro output in the context of
       explicit renaming macros.  In general, however, this cannot lead
-      to robust macros as the following example shows:</p>
+      to robust macros in a typical implementation as the following
+      example shows:</p>
 
     <pre><small>    (define-syntax loop
       (er-macro-transformer
@@ -227,10 +228,11 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     (foo 42)</small></pre>
 
     <p>The macro writer may expect that the
-      expression <code>(foo)</code> evaluates to 42.  Instead, the
-      program will fail because the identifier <code>exit</code> in
-      the template of the <code>foo</code> macro is effectively renamed and
-      does not capture the binding of the identifier <code>exit</code>
+      expression <code>(foo)</code> evaluates to 42.  Instead, in most
+      implementations the program will fail because the
+      identifier <code>exit</code> in the template of
+      the <code>foo</code> macro is effectively renamed and does not
+      capture the binding of the identifier <code>exit</code>
       introduced by the <code>loop</code> macro.</p>
 
     <p>The following rewrite of <code>foo</code> will
@@ -265,6 +267,15 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       It is unspecified whether <code>er-macro-transformer</code> is
       bound to a type of syntax or a (location holding a) procedure and
       whether identifiers are disjoint from symbols or not.</p>
+
+    <p><i>Note 4:</i> In view of the above, it is recommended
+      that <code>er-macro-transformer</code> is implemented in a way
+      so that raw symbols in the output are closed in the syntactic
+      environment of the invoking macro keyword.  Furthemore, it is
+      recommended that the <code>rename</code> procedure accepts
+      arbitrary datums representing Scheme code and that
+      the <code>compare</code> procedure closes raw symbols in the
+      syntactic environment of the invoking macro keyword.</p>
 
     <h4>The <code>syntax-case</code> system</h4>
 
@@ -379,6 +390,11 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>make-synthetic-identifier</code></li>
     </ul>
 
+    <p><i>Note:</i> Depending on whether the underlying low-system can
+      interpret raw symbols as identifiers, the
+      predicate <code>identifier?</code> may either
+      return <code>#t</code> or <code>#f</code> when applied to symbols.</p>
+
     <h2 id="implementation">Implementation</h2>
 
     <p>The implementation is necessarily distinct for every Scheme
@@ -398,8 +414,10 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
 
     <p>The <a href="https://www.unsyntax.org">Unsyntax implementation
         of the Scheme programming language</a> currently provides all
-        of the above libraries except for <code>(srfi 211
-        sc-macro-transformer)</code>.</p>
+      of the above libraries except for <code>(srfi 211
+        sc-macro-transformer)</code>.  The implementation
+      of <code>er-macro-transformer</code> follows all of the above
+      recommendations.</p>
 
     <h2 id="acknowledgements">Acknowledgements</h2>
 
