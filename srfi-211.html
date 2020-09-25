@@ -260,9 +260,11 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       provided as well.</p>
 
     <p><i>Note 3:</i> It is generally an error if
-    the <code>rename</code> procedure is applied to a non-symbol.  It
-    is unspecified whether <code>er-macro-transformer</code> is bound
-    to a type of syntax or a (location holding a) procedure.</p>
+      the <var>rename</var> procedure is applied to a non-symbol or if
+      the <var>compare</var> procedure is applied to non-identifiers.
+      It is unspecified whether <code>er-macro-transformer</code> is
+      bound to a type of syntax or a (location holding a) procedure and
+      whether identifiers are disjoint from symbols or not.</p>
 
     <h4>The <code>syntax-case</code> system</h4>
 
