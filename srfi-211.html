@@ -169,7 +169,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     (define-syntax <span class="token">keyword</span>
       (lisp-transformer
         (lambda (<var>exp</var>)
-          (let-values ((<span class="token">formals</span>) <var>exp</var>)
+          (let-values ((<span class="token">formals</span> (apply values (cdr <var>exp</var>))))
             <span class="token">body<sub>1</sub></span> <span class="token">body<sub>2</sub></span> &hellip;))))</pre>
 
     <p><code>(with-ellipsis <span class="token">ellipsis
