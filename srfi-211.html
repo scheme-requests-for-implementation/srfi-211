@@ -123,7 +123,54 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2 id="specification">Specification</h2>
 
+    <h3>Procedures</h3>
+
+    <p><code>(lisp-transformer <var>proc</var>)</code></p>
+
+    <p>It is an error if <var>proc</var> is not a procedure accepting
+    a single argument.</p>
+
+    <p>The <code>lisp-transformer</code> procedure returns a
+      transformer such that each use of a macro whose keyword is
+      associated with it replaces the macro use with the datum
+      resulting from invoking <code><var>proc</var></code> on the
+      datum representing the macro use.</p>
+
     <h3>Syntax</h3>
+
+    <p><code>(define-macro <span class="token">keyword</span> <span class="token">transformer</span>)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
+      is an identifier
+      and <code><span class="token">transformer</span></code> an expression.</p>
+
+    <p><i>Semantics: </i> This syntax definition is equivalent to
+    the syntax definition</p>
+
+    <pre class="code">
+    (define-syntax <span class="token">keyword</span>
+      (lisp-transformer <span class="token">transformer</span>))</pre>
+
+    <p><code>(define-macro (<span class="token">keyword</span>
+        . <span class="token">formals</span>)
+        <span class="token">body<sub>1</sub></span> <span class="token">body<sub>1</sub></span> &hellip;)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
+      is an
+      identifier, <code><span class="token">formals</span></code> a
+      formal arguments list,
+      and <code><span class="token">transformer</span></code> an
+      expression.</p>
+
+    <p><i>Semantics: </i> This syntax definition is equivalent to
+    the syntax definition</p>
+
+    <pre class="code">
+    (define-syntax <span class="token">keyword</span>
+      (lisp-transformer
+        (lambda (<var>exp</var>)
+          (let-values ((<span class="token">formals</span>) <var>exp</var>)
+            <span class="token">body<sub>1</sub></span> <span class="token">body<sub>2</sub></span> &hellip;))))</pre>
 
     <p><code>(with-ellipsis <span class="token">ellipsis
     identifier</span> <span class="token">expression or
@@ -480,6 +527,25 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       interpret raw symbols as identifiers, the
       predicate <code>identifier?</code> may either
       return <code>#t</code> or <code>#f</code> when applied to symbols.</p>
+
+    <h4>Old-style Lisp macros</h4>
+
+    <p><code>(srfi 211 define-macro)</code></p>
+
+    <p>The <code>(srfi 211 define-macro)</code> library exports the identifiers</p>
+
+    <ul>
+      <li><code>define-macro</code></li>
+      <li><code>lisp-transformer</code></li>
+    </ul>
+
+    <p>as described above.</p>
+
+    <p><i>Note: </i> An implementation that does not
+      support <code>define-syntax</code>,
+      <code>let-syntax</code>, or <code>letrec-syntax</code> need not
+      define <code>lisp-transformer</code>.
+    </p>
 
     <h2 id="implementation">Implementation</h2>
 
