@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>SRFI 211: Namespaces for Scheme Macro Systems</title>
+    <title>SRFI 211: Scheme Macro Libraries</title>
     <link href="/favicon.png" rel="icon" sizes="192x192" type="image/png">
     <link rel="stylesheet" href="https://srfi.schemers.org/srfi.css"
 type="text/css">
@@ -24,11 +24,14 @@ type="text/css">
       {
           content: "〉";
       }
-    </style></head>
+      pre.code {
+          font-size: 80%;
+      }
+  </style></head>
   <body>
     <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo"
 src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
-/></a>211: Namespaces for Scheme Macro Systems</h1>
+/></a>211: Scheme Macro Libraries</h1>
 
     <p>by Marc Nieper-Wißkirchen</p>
 
@@ -49,6 +52,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     </p>
 
     <h2 id="issues">Issues</h2>
+
+    <p>This SRFI will grow into a full specification of the procedures
+    and syntax mentioned here.</p>
 
     <h2 id="rationale">Rationale</h2>
 
@@ -113,13 +119,91 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2 id="specification">Specification</h2>
 
+    <h3>Syntax</h3>
+
+    <p><code>(with-ellipsis <span class="token">ellipsis
+    identifier</span> <span class="token">expression or
+    definition</span> &hellip;)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Ellipsis identifier</span></code> is an identifier.</p>
+
+    <p><i>Semantics:</i> The <code><span class="token">expressions and
+          definitions</span></code> are spliced into the surrounding
+      lexical context just as if they were contained in
+      a <code>begin</code> sequencing construct but expanded in an
+      extended syntactic environment.  In this extended syntactic
+      environment,
+      an <code><span class="token">ellipsis</span></code> in a
+      macro pattern or template is an identifier such that binding
+      the <code><span class="token">ellipsis
+          identifier</span></code> would shadow free references to
+      it.</p>
+
+    <p><i>Note:</i> The normal behavior is that
+    an <code><span class="token">ellipsis</span></code> in a macro
+    pattern or template is an identifier that has the same binding
+    as <code>...</code>.</p>
+
+    <p><i>Rationale:</i> In the <code>syntax-case</code> system,
+      the <code>syntax-rules</code> facility is destructured into its
+      natural components, a pattern matcher (<code>syntax-case</code>)
+      and a templating engine (<code>syntax</code>).  Accordingly, in
+      such a system, <code>syntax-rules</code> is naturally defined in
+      terms of <code>syntax-case</code> and <code>syntax</code>, and
+      the R<sup>6</sup>RS gives an
+      according <a href="http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html#node_sec_12.8">definition</a>
+      of <code>syntax-rules</code>.
+    </p>
+
+    <p>R<sup>7</sup>RS adopted all of the <code>syntax-rules</code>
+    extensions
+    of <cite><a href="https://srfi.schemers.org/srfi-46/srfi-46.html">SRFI
+    46: Basic Syntax-rules Extensions</a></cite>, including the
+    possibility of specifying a custom ellipsis.
+    The <code>with-ellipsis</code> form described here gives the same
+    power to <code>syntax-case</code> and <code>syntax</code> and
+    ensures that <code>syntax-rules</code> is still a simple derived
+    form of <code>syntax-case</code> and <code>syntax</code>.</p>
+
+    <pre class="code">
+    (syntax-rules <span class="token">ellipsis</span> (<span class="token">pattern literal</span> &hellip;)
+      <span class="token">syntax rule</span> &hellip;)</pre>
+
+    <p>of a <code>syntax-rules</code> transformer is equivalent to</p>
+
+    <pre class="code">
+    (with-ellipsis <span class="token">ellipsis</span>
+      (syntax-rules (<span class="token">pattern literal</span> &hellip;)
+        <span class="token">syntax rule</span> &hellip;))</pre>
+
+    <p>The following example comes from
+    the <cite><a href="https://www.gnu.org/software/guile/manual/html_node/Syntax-Case.html#Custom-Ellipsis-Identifiers-for-syntax_002dcase-Macros">GNU
+    Guile Reference Manual</a></cite>.</p>
+
+    <pre class="code">
+    (define-syntax define-quotation-macros
+      (lambda (x)
+        (syntax-case x ()
+          ((_ (macro-name head-symbol) ...)
+           #&apos;(begin (define-syntax macro-name
+                      (lambda (x)
+                        (with-ellipsis :::
+                          (syntax-case x ()
+                            ((_ x :::)
+                             #&apos;(quote (head-symbol x :::)))))))
+                    ...)))))
+    (define-quotation-macros (quote-a a) (quote-b b) (quote-c c))
+    (quote-a 1 2 3)                                                 &xrArr; (a 1 2 3)</pre>
+
     <h3>Libraries</h3>
 
     <p>An implementation does not have to provide all the libraries
       below.  If it provides a library, it has to provide it as a
       whole and not just a subset of it.</p>
 
-    <p><code>(srfi 211 r4rs)</code></p>
+    <h4>The low-level macro facility of the R<sup>4</sup>RS</h4>
+
+    <p><code>(srfi 211 low-level)</code></p>
 
     <p>The low-level macro facility as documented in the third section
       of the appendix to
@@ -167,7 +251,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       abstract nature of a syntax object, this can be easily achieved
       by implementations.</p>
 
-    <p><code>(srfi 211 er-macro-transformer)</code></p>
+    <h4>Explicitly renaming macros</h4>
+
+    <p><code>(srfi 211 explicit-renaming)</code></p>
 
     <p>The <code>er-macro-transformer</code> facility as documented by
       William Clinger
@@ -180,6 +266,98 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>er-macro-transformer</code></li>
       <li><code>identifier?</code></li>
     </ul>
+
+    <p><i>Note 1:</i> Classically, to test whether binding one
+      identifier would also bind the other, the equivalence
+      predicate <code>eqv?</code> is used in the context of explicit
+      renaming macros.  In general, however, this equivalence
+      predicate is too fine as soon as the system is augmented with a
+      means to capture the syntactic environment of an identifier as
+      the following code shows:</p>
+
+    <pre><small>    (let ((x #f))
+      (let ((x #f)) ...))</small></pre>
+
+    <p>In the context of <code>...</code> binding one of the two
+      identifiers named <code>x</code> would certainly also bind the
+      other.  However, both identifiers cannot be equivalent because
+      the syntactic environment of the second is extended by the
+      binding of the first.</p>
+
+    <p>Consequently, macro programmers should
+      use <code>bound-identifier=?</code> instead of <code>eqv?</code>
+      whenever one of the library <code>(srfi 211 low-level)</code>
+      or <code>(srfi 211 syntax-case)</code> is provided as well.</p>
+
+    <p><i>Note 2:</i> Classically, to implement non-hygienic macros,
+      raw symbols are inserted into the macro output in the context of
+      explicit renaming macros.  In general, however, this cannot lead
+      to robust macros in a typical implementation as the following
+      example shows:</p>
+
+    <pre><small>    (define-syntax loop
+      (er-macro-transformer
+        (lambda (x r c)
+          (let ((body (cdr x)))
+            `(,(r &apos;call-with-current-continuation)
+              (,(r &apos;lambda) (exit)
+               (,(r &apos;let) ,(r &apos;f) () ,@body (,(r &apos;f)))))))))
+
+    (define-syntax foo
+      (syntax-rules ()
+        ((foo x) (loop (exit x)))))
+
+    (foo 42)</small></pre>
+
+    <p>The macro writer may expect that the
+      expression <code>(foo)</code> evaluates to 42.  Instead, in most
+      implementations the program will fail because the
+      identifier <code>exit</code> in the template of
+      the <code>foo</code> macro is effectively renamed and does not
+      capture the binding of the identifier <code>exit</code>
+      introduced by the <code>loop</code> macro.</p>
+
+    <p>The following rewrite of <code>foo</code> will
+    solve <em>this</em> problem.</p>
+
+    <pre><small>    (define-syntax foo
+      (er-macro-transformer (x r c)
+        `(,(r loop) (exit ,(cadr x)))))</small></pre>
+
+    <p>This rewrite does not solve another problem, however.  The
+    expression</p>
+
+    <pre><small>    (let ((exit 42))
+      (foo exit))</small></pre>
+
+    <p>evaluates to the procedure <code>exit</code> introduced by
+      the <code>loop</code> macro, not to 42, which may have been
+      expected.  The real problem lies in the <code>loop</code> macro,
+      which should have renamed <code>exit</code> in the context of
+      the macro invoking it.</p>
+
+    <p>Consequentely, macro programmers should not insert raw symbols
+      in the macro output, but use <code>construct-identifier</code>
+      from <code>(srfi 211 low-level)</code>
+      or <code>datum-&gt;syntax</code> from <code>(srfi 211
+      syntax-case)</code> when any of these two libraries is
+      provided as well.</p>
+
+    <p><i>Note 3:</i> It is generally an error if
+      the <var>rename</var> procedure is applied to a non-symbol or if
+      the <var>compare</var> procedure is applied to non-identifiers.
+    </p>
+
+    <p><i>Note 4:</i> In view of the above, it is recommended
+      that <code>er-macro-transformer</code> is implemented in a way
+      so that raw symbols in the output are closed in the syntactic
+      environment of the invoking macro keyword.  Furthemore, it is
+      recommended that the <code>rename</code> procedure accepts
+      arbitrary datums representing Scheme code and that
+      the <code>compare</code> procedure closes raw symbols in the
+      syntactic environment of the invoking macro keyword.</p>
+
+    <h4>The <code>syntax-case</code> system</h4>
 
     <p><code>(srfi 211 syntax-case)</code></p>
 
@@ -203,6 +381,12 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>syntax-violation</code></li>
     </ul>
 
+    <p><i>Note:</i> <code>Syntax-case</code> shall
+      accept <code>...</code> and <code>_</code> as literal
+      identifiers.</p>
+
+    <h4>Identifier syntax</h4>
+
     <p><code>(srfi 211 identifier-syntax)</code></p>
 
     <p>The <code>identifier-syntax</code> transformer documented in
@@ -219,6 +403,8 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>identifier-syntax</code></li>
     </ul>
 
+    <h4>Variable transformers</h4>
+
     <p><code>(srfi 211 variable-transformer)</code></p>
 
     <p>The <em>variable transformer</em> facility as documented in the
@@ -228,19 +414,19 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>make-variable-transformer</code></li>
     </ul>
 
+    <h4>Custom ellipsis identifiers</h4>
+
     <p><code>(srfi 211 with-ellipsis)</code></p>
 
-    <p>The <code>with-ellipsis</code> special
-      form <a href="https://www.gnu.org/software/guile/manual/html_node/Syntax-Case.html#Custom-Ellipsis-Identifiers-for-syntax_002dcase-Macros">documented
-      by GNU Guile</a>, which allows to express <code>syntax-rules</code>
-      with
-      its <a href="https://srfi.schemers.org/srfi-46/srfi-46.html">SRFI
-      46</a> extensions in terms of <code>syntax-case</code>.
-      Exports the identifier</p>
+    <p>The <code>(srfi 211 with-ellipsis)</code> library exports the syntax</p>
 
     <ul>
       <li><code>with-ellipsis</code></li>
     </ul>
+
+    <p>as described above.</p>
+
+    <h4>Syntax parameters</h4>
 
     <p><code>(srfi 211 syntax-parameter)</code></p>
 
@@ -253,7 +439,21 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>syntax-parameterize</code></li>
     </ul>
 
-    <p><code>(srfi 211 sc-macro-transformer)</code></p>
+    <h4>Implicitly renaming macros</h4>
+
+    <p><code>(srfi 211 implicit-renaming)</code></p>
+
+    <p>The <code>ir-macro-transformer</code>
+    facility <a href="https://wiki.call-cc.org/man/4/Macros#ir-macro-transformer">as
+        documented by CHICKEN</a>.  Exports the identifier</p>
+
+    <ul>
+      <li>ir-macro-transformer</li>
+    </ul>
+
+    <h4>Syntactic-closures macro transformers</h4>
+
+    <p><code>(srfi 211 syntactic-closures)</code></p>
 
     <p>The <code>sc-macro-transformer</code>
       facility <a href="https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/Syntactic-Closures.html#Syntactic-Closures">as
@@ -270,6 +470,11 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>make-synthetic-identifier</code></li>
     </ul>
 
+    <p><i>Note:</i> Depending on whether the underlying low-system can
+      interpret raw symbols as identifiers, the
+      predicate <code>identifier?</code> may either
+      return <code>#t</code> or <code>#f</code> when applied to symbols.</p>
+
     <h2 id="implementation">Implementation</h2>
 
     <p>The implementation is necessarily distinct for every Scheme
@@ -281,11 +486,17 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
 
     <p>
       Implementers are highly encouraged to provide an implementation
-      of the low-level macro facility <code>(srfi 211 r4rs)</code>,
+      of the low-level macro facility <code>(srfi 211 low-level)</code>,
       which can serve as a foundation for <code>syntax-rules</code>
       and as a common denominator between the different Scheme
       implementations.
     </p>
+
+    <p>The <a href="https://www.unsyntax.org">Unsyntax implementation
+        of the Scheme programming language</a> provides all
+      of the above libraries.  Its implementation
+      of <code>er-macro-transformer</code> follows all of the above
+      recommendations.</p>
 
     <h2 id="acknowledgements">Acknowledgements</h2>
 
@@ -293,6 +504,14 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       extensions to the <code>syntax-rules</code> macro facility
       that are covered by this SRFI.
     </p>
+
+    <p>The idea for <code>with-ellipsis</code> comes
+      from <a href="https://www.gnu.org/software/guile/">GNU Guile</a>.</p>
+
+    <p>Alex Shinn came up with the final title of this SRFI.</p>
+
+    <p>Thanks to John Cowan and Alex Shinn for their insistence to
+    make this SRFI as much as independent from external sources.</p>
 
     <h2 id="copyright">Copyright</h2>
     <p>&copy; 2020 Marc Nieper-Wißkirchen.</p>
