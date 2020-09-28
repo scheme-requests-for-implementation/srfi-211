@@ -50,7 +50,8 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2 id="issues">Issues</h2>
 
-    <p>The procedures and syntax shall be documented in this SRFI.</p>
+    <p>This SRFI will grow into a full specification of the procedures
+    and syntax mentioned here.</p>
 
     <h2 id="rationale">Rationale</h2>
 
@@ -266,9 +267,7 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p><i>Note 3:</i> It is generally an error if
       the <var>rename</var> procedure is applied to a non-symbol or if
       the <var>compare</var> procedure is applied to non-identifiers.
-      It is unspecified whether <code>er-macro-transformer</code> is
-      bound to a type of syntax or a (location holding a) procedure and
-      whether identifiers are disjoint from symbols or not.</p>
+    </p>
 
     <p><i>Note 4:</i> In view of the above, it is recommended
       that <code>er-macro-transformer</code> is implemented in a way
@@ -302,6 +301,10 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       <li><code>unsyntax-splicing</code></li>
       <li><code>syntax-violation</code></li>
     </ul>
+
+    <p><i>Note:</i> <code>Syntax-case</code> shall
+      accept <code>...</code> and <code>_</code> as literal
+      identifiers.</p>
 
     <h4>Identifier syntax</h4>
 
@@ -429,6 +432,9 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     </p>
 
     <p>Alex Shinn came up with the final title of this SRFI.</p>
+
+    <p>Thanks to John Cowan and Alex Shinn for their insistence to
+    make this SRFI as much as independent from external sources.</p>
 
     <h2 id="copyright">Copyright</h2>
     <p>&copy; 2020 Marc Nieper-Wißkirchen.</p>
