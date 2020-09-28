@@ -1,4 +1,4 @@
-* SRFI 211: Namespaces for Scheme Macro Systems
+* SRFI 211: Scheme Macro Libraries
 
 ** by Marc Nieper-Wißkirchen
 
@@ -6,7 +6,7 @@
 
 keywords: [[https://srfi.schemers.org/?keywords=syntax][Syntax]]
 
-This repository hosts [[https://srfi.schemers.org/srfi-211/][SRFI 211]]: Namespaces for Scheme Macro Systems, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
+This repository hosts [[https://srfi.schemers.org/srfi-211/][SRFI 211]]: Scheme Macro Libraries, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
 
 This SRFI is in /draft/ status.
 
