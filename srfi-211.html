@@ -24,7 +24,10 @@ type="text/css">
       {
           content: "〉";
       }
-    </style></head>
+      pre.code {
+          font-size: 80%;
+      }
+  </style></head>
   <body>
     <h1><a href="https://srfi.schemers.org/"><img class="srfi-logo"
 src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
@@ -115,6 +118,82 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
                 `(,(r 'letrec*) () ,@(list-tail (cddr e) (cadr e))))))))))</small></pre>
 
     <h2 id="specification">Specification</h2>
+
+    <h3>Syntax</h3>
+
+    <p><code>(with-ellipsis <span class="token">ellipsis
+    identifier</span> <span class="token">expression or
+    definition</span> &hellip;)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Ellipsis identifier</span></code> is an identifier.</p>
+
+    <p><i>Semantics:</i> The <code><span class="token">expressions and
+          definitions</span></code> are spliced into the surrounding
+      lexical context just as if they were contained in
+      a <code>begin</code> sequencing construct but expanded in an
+      extended syntactic environment.  In this extended syntactic
+      environment,
+      an <code><span class="token">ellipsis</span></code> in a
+      macro pattern or template is an identifier such that binding
+      the <code><span class="token">ellipsis
+          identifier</span></code> would shadow free references to
+      it.</p>
+
+    <p><i>Note:</i> The normal behavior is that
+    an <code><span class="token">ellipsis</span></code> in a macro
+    pattern or template is an identifier that has the same binding
+    as <code>...</code>.</p>
+
+    <p><i>Rationale:</i> In the <code>syntax-case</code> system,
+      the <code>syntax-rules</code> facility is destructured into its
+      natural components, a pattern matcher (<code>syntax-case</code>)
+      and a templating engine (<code>syntax</code>).  Accordingly, in
+      such a system, <code>syntax-rules</code> is naturally defined in
+      terms of <code>syntax-case</code> and <code>syntax</code>, and
+      the R<sup>6</sup>RS gives an
+      according <a href="http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html#node_sec_12.8">definition</a>
+      of <code>syntax-rules</code>.
+    </p>
+
+    <p>R<sup>7</sup>RS adopted all of the <code>syntax-rules</code>
+    extensions
+    of <cite><a href="https://srfi.schemers.org/srfi-46/srfi-46.html">SRFI
+    46: Basic Syntax-rules Extensions</a></cite>, including the
+    possibility of specifying a custom ellipsis.
+    The <code>with-ellipsis</code> form described here gives the same
+    power to <code>syntax-case</code> and <code>syntax</code> and
+    ensures that <code>syntax-rules</code> is still a simple derived
+    form of <code>syntax-case</code> and <code>syntax</code>.</p>
+
+    <pre class="code">
+    (syntax-rules <span class="token">ellipsis</span> (<span class="token">pattern literal</span> &hellip;)
+      <span class="token">syntax rule</span> &hellip;)</pre>
+
+    <p>of a <code>syntax-rules</code> transformer is equivalent to</p>
+
+    <pre class="code">
+    (with-ellipsis <span class="token">ellipsis</span>
+      (syntax-rules (<span class="token">pattern literal</span> &hellip;)
+        <span class="token">syntax rule</span> &hellip;))</pre>
+
+    <p>The following example comes from
+    the <cite><a href="https://www.gnu.org/software/guile/manual/html_node/Syntax-Case.html#Custom-Ellipsis-Identifiers-for-syntax_002dcase-Macros">GNU
+    Guile Reference Manual</a></cite>.</p>
+
+    <pre class="code">
+    (define-syntax define-quotation-macros
+      (lambda (x)
+        (syntax-case x ()
+          ((_ (macro-name head-symbol) ...)
+           #&apos;(begin (define-syntax macro-name
+                      (lambda (x)
+                        (with-ellipsis :::
+                          (syntax-case x ()
+                            ((_ x :::)
+                             #&apos;(quote (head-symbol x :::)))))))
+                    ...)))))
+    (define-quotation-macros (quote-a a) (quote-b b) (quote-c c))
+    (quote-a 1 2 3)                                                 &xrArr; (a 1 2 3)</pre>
 
     <h3>Libraries</h3>
 
@@ -339,17 +418,13 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
 
     <p><code>(srfi 211 with-ellipsis)</code></p>
 
-    <p>The <code>with-ellipsis</code> special
-      form <a href="https://www.gnu.org/software/guile/manual/html_node/Syntax-Case.html#Custom-Ellipsis-Identifiers-for-syntax_002dcase-Macros">documented
-      by GNU Guile</a>, which allows to express <code>syntax-rules</code>
-      with
-      its <a href="https://srfi.schemers.org/srfi-46/srfi-46.html">SRFI
-      46</a> extensions in terms of <code>syntax-case</code>.
-      Exports the identifier</p>
+    <p>The <code>(srfi 211 with-ellipsis)</code> library exports the syntax</p>
 
     <ul>
       <li><code>with-ellipsis</code></li>
     </ul>
+
+    <p>as described above.</p>
 
     <h4>Syntax parameters</h4>
 
@@ -429,6 +504,9 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       extensions to the <code>syntax-rules</code> macro facility
       that are covered by this SRFI.
     </p>
+
+    <p>The idea for <code>with-ellipsis</code> comes
+      from <a href="https://www.gnu.org/software/guile/">GNU Guile</a>.</p>
 
     <p>Alex Shinn came up with the final title of this SRFI.</p>
 
