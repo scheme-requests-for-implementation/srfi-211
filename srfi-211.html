@@ -18,11 +18,11 @@ type="text/css">
       }
       span.token::before
       {
-          content: "〈";
+          content: "⟨";
       }
       span.token::after
       {
-          content: "〉";
+          content: "⟩";
       }
       pre.code {
           font-size: 80%;
@@ -50,15 +50,14 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2 id="abstract">Abstract</h2>
 
-    <p>This SRFI defines library name spaces where common extensions
-      of the <code>syntax-rules</code> macro facility can be located
+    <p>This SRFI describes common syntactic extensions of the <code>syntax-rules</code> macro facility of R5RS and the base R6RS and R7RS libraries.  In particular,
+      library name spaces are defined where these extensions can be located
       and which can be tested against in <code>cond-expand</code> forms.
     </p>
 
     <h2 id="issues">Issues</h2>
 
-    <p>This SRFI will grow into a full specification of the procedures
-    and syntax mentioned here.</p>
+    <p>The description of syntactic closures is not yet complete.</p>
 
     <h2 id="rationale">Rationale</h2>
 
@@ -73,13 +72,8 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>This SRFI therefore defines a number of standard libraries
       under which supporting implementations export the identifiers of
       those <code>syntax-rules</code> extensions they implement so
-      that portable code can be written without loading implementation
-      specific libraries.
-    </p>
-
-    <p>It's not the purpose of this SRFI to define the meaning of
-      these identifiers as these are documented elsewhere by the
-      various extensions to <code>syntax-rules</code>.
+      that portable code can be written without explicit loading
+      implementation specific libraries.
     </p>
 
     <h3>Example</h3>
@@ -123,54 +117,330 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2 id="specification">Specification</h2>
 
+    <p>As a baseline for this specification, we build on the definitions
+      used in the <a href="http://www.r6rs.org">R<sup>6</sup>RS</a>,
+      especially those described in chapter 12 of the R<sup>6</sup>RS
+      Standard Libraries.</p>
+
+    <h3>Syntax objects</h3>
+
+    <p><dfn>Syntax objects</dfn>, <dfn>wrapped syntax objects</dfn>,
+    and (syntax objects representing) <dfn>identifiers</dfn> are
+    defined as in section 12.2 of the R<sup>6</sup>RS Standard
+    Libraries.</p>
+
+    <h3>Quasi-syntax objects</h3>
+
+    <p>A <dfn>quasi-syntax object</dfn> is a generalization of a
+    syntax object that allows symbols at its leaves.  More precisely,
+      a quasi-syntax object is
+
+    <ul>
+      <li>a pair or list of quasi-syntax objects,</li>
+      <li>a vector of quasi-syntax objects,</li>
+      <li>a constant,</li>
+      <li>a wrapped syntax object, or</li>
+      <li>a symbol.</li>
+    </ul>
+
+    <p>A <dfn>quasi-identifier</dfn> is a value that is either an
+    identifier or a symbol.</p>
+
+    <h3>Transformers</h3>
+
+    <p>A <dfn>transformer</dfn> is a transformation procedure or a
+      variable transformer as in section 12.3 of the R<sup>6</sup>RS
+      Standard Libraries, or an <em>explicitly renaming
+	transformer</em>, an <em>implicitly renaming transformer</em>,
+      a <em>syntactic closures transformer</em>, or a <em>Lisp
+	transformer</em>.</p>
+
+    <h3>Injecting and renaming</h3>
+
+    <p>In the context of a transformer being applied to transcribe a macro use of a
+      keyword, <dfn>injecting</dfn> a symbol results in an identifier with
+      the same name that behaves as if it was introduced into the code
+      where the keyword was used.</p>
+
+    <p>In the same context, <dfn>renaming</dfn> a symbol results in an
+      identifier with the same name that behaves as if it were
+      introduced into the code where the keyword was defined.</p>
+
+    <p>In the same context, the <dfn>injection</dfn> of a quasi-syntax
+      object is a syntax object recursively built from it by replacing
+      each symbol at the leaves with its injection, and
+      the <dfn>renaming</dfn> of quasi-syntax object is a syntax
+      object recursively build from it by replacing each symbol at the
+      leaves with its renaming.  Both the injection and the renaming
+      preserve any shared or cyclic structure.</p>
+
     <h3>Procedures</h3>
+
+    <h4>Identifier predicates</h4>
+
+    <p><code>(identifier? <var>obj</var>)</code></p>
+
+    <p>This procedure is defined in section 12.5 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>(quasi-identifier? <var>obj</var>)</code></p>
+
+    <p>The <code>quasi-identifier?</code> procedure
+    returns <code>#t</code> if <code><var>obj</var></code> is either
+    an identifier or a symbol, and <code>#f</code> otherwise.</p>
+
+    <p><code>(bound-identifier=? <var>id<sub>1</sub></var> <var>id<sub>2</sub></var>)</code></p>
+
+    <p>This procedure is defined in section 12.5 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>(free-identifier=? <var>id<sub>1</sub></var> <var>id<sub>2</sub></var>)</code></p>
+
+    <p>This procedure is defined in section 12.5 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <h4>Syntax-object and datum conversions</h4>
+
+    <p><code>(syntax-&gt;datum <var>obj</var>)</code></p>
+
+    <p>This procedure is defined in section 12.6 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>(quasi-syntax-&gt;datum <var>obj</var>)</code></p>
+
+    <p>It is an error if <code><var>obj</var></code> is not a quasi-syntax object.</p>
+
+    <p>The procedure <code>quasi-syntax-&gt;datum</code> strips all
+    syantactic information from the quasi-syntax
+    object <code><var>obj</var></code> and returns the corresponding
+    Scheme datum.  The difference to <code>syntax-&gt;datum</code> is
+    that symbols at the leaves are explicitly allowed and which are
+    converted to themselves.</p>
+
+    <p><code>(identifier-&gt;symbol <var>id</var>)</code></p>
+
+    <p>It is an error if <code><var>id</var></code> is not an identifier.</p>
+
+    <p>The procedure <code>identifier-&gt;symbol</code> returns the
+    symbolic name of the identifier <code><var>id</var></code>,
+    i.e. the result of applying <code>syntax-&gt;datum</code>
+    to <code><var>id</var></code>.
+
+    <p><code>(quasi-identifier-&gt;symbol <var>id</var>)</code></p>
+
+    <p>It is an error if <code><var>id</var></code> is not a quasi-identifier.</p>
+
+    <p>The procedure <code>quasi-identifier-&gt;symbol</code> returns
+    the symbolic name of the identifier <code><var>id</var></code>.
+    The difference to <code>syntax-&gt;datum</code> is that symbols
+      are allowed and which are their own symbolic name.</p>
+
+    <p><code>(unwrap-syntax <code>obj</code>)</code></p>
+
+    <p>It is an error if <code><var>obj</var></code> is not a syntax object.</p>
+
+    <p>If <code><var>obj</var></code> is an identifier or an unwrapped
+      syntax object, the procedure <code>unwrap-syntax</code>
+      returns <code><var>obj</var></code> unchanged.
+      If <code><var>obj</var></code> is a wrapped syntax
+      object, <code>unwrap-syntax</code> returns the underlying unwrapped syntax object.</p>
+
+    <p><code>(unwrap-quasi-syntax <code>obj</code>)</code></p>
+
+    <p>It is an error if <code><var>obj</var></code> is not a quasi-syntax object.</p>
+
+    <p>If <code><var>obj</var></code> is a quasi-identifier or an
+      unwrapped quasi-syntax object, the procedure <code>unwrap-syntax</code>
+      returns <code><var>obj</var></code> unchanged.
+      If <code><var>obj</var></code> is a wrapped syntax
+      object, <code>unwrap-syntax</code> returns the underlying
+      unwrapped syntax object.</p>
+
+    <p><code>(datum-&gt;syntax <var>id</var> <var>datum</var>)</code></p>
+
+    <p>This procedure is defined in section 12.6 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>(construct-identifier <var>id</var> <var>symbol</var>)</code></p>
+
+    <p>It is an error if <code><var>id</var></code> is not an
+    identifier or if <code><var>symbol</var></code> is not a
+    symbol.</p>
+
+    <p>This procedure returns the result of
+      applying <code>datum-&gt;syntax</code> to the
+      arguments <code><var>id</var></code>
+      and <code><var>symbol</var></code>.</p>
+
+    <h4>Generating temporaries</h4>
+
+    <p><code>(generate-temporaries <var>list</var>)</code></p>
+
+    <p>This procedure is defined in section 12.7 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>(generate-identifier)</code></p>
+    <p><code>(generate-identifier <var>symbol</var>)</code></p>
+
+    <p>The <code>generate-identifier</code> procedure returns a new,
+    unique identifier.  The symbolic name of the identifier
+    is <code><var>symbol</var></code> if provided, and unspecified
+      otherwise.</p>
+
+    <h4>Syntax violations</h4>
+
+    <p><code>(syntax-violation <var>who</var> <var>message</var> <var>form</var>)</code></p>
+    <p><code>(syntax-violation <var>who</var> <var>message</var> <var>form</var> <var>subform</var>)</code></p>
+
+    <p>This procedure is defined in section 12.9 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><i>Note:</i> An implementation that does not have condition objects
+    as defined in chapter 7 of the R<sup>6</sup>RS Standard Libraries
+    should raise an exception with an appropriate native condition
+    object instead.</p>
+
+    <h4>Transformers</h4>
+
+    <p><code>(make-variable-transformer <var>transformer</var>)</code></p>
+
+    <p>The <code>make-variable-transformer</code> procedure behaves as
+      defined in section 12.3 of the R<sup>6</sup>RS Standard
+      Libraries, except that <code><var>transformer</var></code> can
+      be a transformation procedure, an explicitly renaming
+      transformer, an implicitly renaming transformer,
+      a syntactic closures transformer, or a Lisp
+      transformer.</p>
+
+    <p><code>(er-macro-transformer <var>proc</var>)</code></p>
+
+    <p>It is an error if <code><var>proc</var></code> is not a
+      procedure accepting a single argument.</p>
+
+    <p>The <code>er-macro-transformer</code> procedure returns an
+      explicitly renaming transformer such that each use of a macro
+      whose keyword is associated with it is transcribed in the
+      following way:</p>
+
+    <p>At first, the input form is recursively fully unwrapped
+      preserving any shared or cyclic structure.
+      Then <code><var>proc</var></code> is called with three
+      arguments, the fully unwrapped input form and two
+      procedures <code><var>rename</var></code>
+      and <code><var>compare</var></code>.  It is an error if it does
+      not return a quasi-syntax object.  The symbols at the leaves of
+      the quasi-syntax object returned are then replaced by their
+      injections to yield the output form as a syntax object.</p>
+
+    <p>The <code><var>rename</var></code> procedure accepts a single
+      argument <code><var>expr</var></code>.  It is an error
+      if <code><var>expr</var></code> is not a quasi-syntax
+      object.  <code><var>Rename</var></code> returns a syntax object
+      that is built from <code><var>expr</var></code> by replacing the
+      symbols at the leaves by their renamings.  This syntax object
+      may share structure with <code><var>expr</var></code>.</p>
+
+    <p>The <code><var>compare</var></code> procedure accepts exactly two arguments
+      <code><var>id<sub>1</sub></var></code>
+      and <code><var>id<sub>2</sub></code>.  It is an error if
+      the <code><var>ids</var></code> are not
+      quasi-identifiers.  <code><var>Compare</var></code>
+      returns the result of <code>free-identifier=?</code> applied to the injections of
+      <code><var>id<sub>1</sub></var></code>
+      and <code><var>id<sub>2</sub></var></code>.</p>
+
+    <p><code>(ir-macro-transformer <var>proc</var>)</code></p>
+
+    <p>It is an error if <code><var>proc</var></code> is not a
+      procedure accepting a single argument.</p>
+
+    <p>The <code>ir-macro-transformer</code> procedure returns an
+      implicitly renaming transformer such that each use of a macro
+      whose keyword is associated with it is transcribed in the
+      following way:</p>
+
+    <p>At first, the input form is recursively fully unwrapped
+      preserving any shared or cyclic structure.
+      Then <code><var>proc</var></code> is called with three
+      arguments, the fully unwrapped input form and two
+      procedures <code><var>inject</var></code>
+      and <code><var>compare</var></code>.  It is an error if it does
+      not return a quasi-syntax object.  The symbols at the leaves of
+      the quasi-syntax object returned are then replaced by their
+      renamings to yield the output form as a syntax object.</p>
+
+    <p>The <code><var>inject</var></code> procedure accepts a single
+      argument <code><var>expr</var></code>.  It is an error
+      if <code><var>expr</var></code> is not a quasi-syntax
+      object.  <code><var>Inject</var></code> returns a syntax object
+      that is built from <code><var>expr</var></code> by replacing the
+      symbols at the leaves by their injections.  This syntax object
+      may share structure with <code><var>expr</var></code>.</p>
+
+    <p>The <code><var>compare</var></code> procedure accepts exactly two arguments
+      <code><var>id<sub>1</sub></var></code>
+      and <code><var>id<sub>2</sub></code>.  It is an error if
+      the <code><var>ids</var></code> are not
+      quasi-identifiers.  <code><var>Compare</var></code> returns the
+      result of <code>free-identifier=?</code> applied to the
+      renamings of
+      <code><var>id<sub>1</sub></var></code>
+      and <code><var>id<sub>2</sub></var></code>.</p>
 
     <p><code>(lisp-transformer <var>proc</var>)</code></p>
 
-    <p>It is an error if <var>proc</var> is not a procedure accepting
-    a single argument.</p>
+    <p>It is an error if <code><var>proc</var></code> is not a
+    procedure accepting a single argument.</p>
 
-    <p>The <code>lisp-transformer</code> procedure returns a
+    <p>The <code>lisp-transformer</code> procedure returns a Lisp
       transformer such that each use of a macro whose keyword is
-      associated with it replaces the macro use with the datum
-      resulting from invoking <code><var>proc</var></code> on the
-      datum representing the macro use.</p>
+      associated with it replaces the macro use with the injection of
+      the datum resulting from invoking <code><var>proc</var></code>
+      on the datum representing the macro use.</p>
+
+    <p><code>(sc-macro-transformer <var>proc</var>)</code></p>
+
+    <p><i>TBD</i></p>
+
+    <p><code>(rsc-macro-transformer <var>proc</var>)</code></p>
+
+    <p><i>TBD</i></p>
+
+    <h4>Syntactic closures</h4>
+
+    <p><code>make-syntactic-closure</code></p>
+
+    <p><i>TBD</i></p>
+
+    <p><code>close-syntax</code></p>
+
+    <p><i>TBD</i></p>
+
+    <p><code>capture-syntactic-environment</code></p>
+
+    <p><i>TBD</i></p>
+
+    <p><code>sc-identifier=?</code></p>
+
+    <p><i>TBD</i></p>
+
+    <p><code>make-synthetic-identifier</code></p>
+
+    <p><i>TBD</i></p>
 
     <h3>Syntax</h3>
 
-    <p><code>(define-macro <span class="token">keyword</span> <span class="token">transformer</span>)</code></p>
+    <h4>Macros</h4>
 
-    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
-      is an identifier
-      and <code><span class="token">transformer</span></code> an expression.</p>
+    <p><code>(<span class="token">keyword</span> <span class="token">datum</span> &hellip;)</code></p>
+    <p><code>(<span class="token">keyword</span> <span class="token">datum</span> &hellip; . <span class="token">datum</span>)</code></p>
+    <p><code><span class="token">keyword</span></code></p>
+    <p><code>(set! <span class="token">keyword</span> <span class="token">datum</span>)</code></p>
 
-    <p><i>Semantics: </i> This syntax definition is equivalent to
-    the syntax definition</p>
+    <p>These macro uses are defined in section 9.2 of the R<sup>6</sup>RS.</p>
 
-    <pre class="code">
-    (define-syntax <span class="token">keyword</span>
-      (lisp-transformer <span class="token">transformer</span>))</pre>
+    <p><i>Note:</i> Every implementation must support the first form
+    of a macro use and should support all four forms.  It must the
+    third form if it provides <code>identifier-syntax</code>, it must
+    support the third and fourth form if it
+    provides <code>make-variable-transformer</code>, and it must
+    support all four forms if it
+    provides <code>syntax-case</code>.</p>
 
-    <p><code>(define-macro (<span class="token">keyword</span>
-        . <span class="token">formals</span>)
-        <span class="token">body<sub>1</sub></span> <span class="token">body<sub>1</sub></span> &hellip;)</code></p>
-
-    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
-      is an
-      identifier, <code><span class="token">formals</span></code> a
-      formal arguments list,
-      and <code><span class="token">transformer</span></code> an
-      expression.</p>
-
-    <p><i>Semantics: </i> This syntax definition is equivalent to
-    the syntax definition</p>
-
-    <pre class="code">
-    (define-syntax <span class="token">keyword</span>
-      (lisp-transformer
-        (lambda (<var>exp</var>)
-          (let-values ((<span class="token">formals</span> (apply values (cdr <var>exp</var>))))
-            <span class="token">body<sub>1</sub></span> <span class="token">body<sub>2</sub></span> &hellip;))))</pre>
+    <h4>Custom ellipsis identifiers</h4>
 
     <p><code>(with-ellipsis <span class="token">ellipsis
     identifier</span> <span class="token">expression or
@@ -201,9 +471,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       and a templating engine (<code>syntax</code>).  Accordingly, in
       such a system, <code>syntax-rules</code> is naturally defined in
       terms of <code>syntax-case</code> and <code>syntax</code>, and
-      the R<sup>6</sup>RS gives an
-      according <a href="http://www.r6rs.org/final/html/r6rs-lib/r6rs-lib-Z-H-13.html#node_sec_12.8">definition</a>
-      of <code>syntax-rules</code>.
+      the R<sup>6</sup>RS gives an according definition
+      of <code>syntax-rules</code> in section 12.8 of its Standard
+      Libraries.
     </p>
 
     <p>R<sup>7</sup>RS adopted all of the <code>syntax-rules</code>
@@ -248,30 +518,138 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     (define-quotation-macros (quote-a a) (quote-b b) (quote-c c))
     (quote-a 1 2 3)                                                 &xrArr; (a 1 2 3)</pre>
 
+    <h4>Parsing input and producing output</h4>
+
+    <p><code>(syntax-case <span class="token">expression</span> (<span class="token">literal</span> &hellip;) <span class="token">syntax-case clause</span>)</code></p>
+
+    <p>This syntax is defined in section 12.4 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p>Contrary to that specification, it is not a syntax violation if
+    the ellipsis or underscore appears
+    in <code>(<span class="token">literal</span> &hellip;)</code>.  If
+    the ellipsis or underscore appear
+    in <code>(<span class="token">literal</span> &hellip;)</code>,
+    they are treated as a literal identifier.</p>
+
+    <p><i>Rationale:</i> This extension to
+      R<sup>6</sup>RS's <code>syntax-case</code> is necessary so that
+      R7RS's <code>syntax-rules</code> can be <em>easily</em> defined in
+      terms of <code>syntax-case</code>.</p>
+
+    <p><i>Note 1:</i> The author of this SRFI believes that the exlusion
+    of the ellipsis and the underscore in the list of literal
+    identifiers was a mistake of the R<sup>6</sup>RS.</p>
+
+    <p><i>Note 2:</i> In the lexical scope of an <code>with-ellipsis</code> form, the meaning of the ellipsis is changed.</p>
+
+    <p><code>(syntax <span class="token">template</span>)</code></p>
+
+    <p>This syntax is defined in section 12.4 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><i>Note:</i> In the lexical scope of an <code>with-ellipsis</code> form, the meaning of the ellipsis is changed.</p>
+
+    <h4>Derived syntax</h4>
+
+    <p><code>(with-syntax ((<span class="token">pattern</span> <span class="token">expression</span>) &hellip;) <span class="token">body</span>)</code></p>
+
+    <p>This syntax is defined in section 12.8 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><i>Note:</i> In the lexical scope of an <code>with-ellipsis</code> form, the meaning of the ellipsis is changed.</p>
+
+    <p><code>(quasisyntax <span class="token">template</span>)</code></p>
+
+    <p>This syntax is defined in section 12.8 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><i>Note:</i> In the lexical scope of an <code>with-ellipsis</code> form, the meaning of the ellipsis is changed.</p>
+
+    <p><code>unsyntax</code></p>
+
+    <p>This auxiliary syntax is defined in section 12.8 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <p><code>unsyntax-splicing</code></p>
+
+    <p>This auxiliary syntax is defined in section 12.8 of the R<sup>6</sup>RS Standard Libraries.</p>
+
+    <h4>Transformers</h4>
+
+    <p><code>(identifier-syntax <span class="token">template</span>)</code></p>
+    <p><code>(identifier-syntax (<span class="token">id<sub>1</sub>) <span class="token">template<sub>1</sub></span>) ((set! <span class="token">id<sub>2</sub> <span class="token">pattern</span>)  <span class="token">template<sub>1</sub></span>))</code></p>
+
+    <p>This syntax is defined in section 11.19 of the R<sup>6</sup>RS.</p>
+
+    <h4>Macro definitions</h4>
+
+    <p><code>(define-macro <span class="token">keyword</span> <span class="token">transformer</span>)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
+      is an identifier
+      and <code><span class="token">transformer</span></code> an expression.</p>
+
+    <p><i>Semantics: </i> This syntax definition is equivalent to
+    the syntax definition</p>
+
+    <pre class="code">
+    (define-syntax <span class="token">keyword</span>
+      (lisp-transformer <span class="token">transformer</span>))</pre>
+
+    <p><code>(define-macro (<span class="token">keyword</span>
+        . <span class="token">formals</span>)
+        <span class="token">body<sub>1</sub></span> <span class="token">body<sub>1</sub></span> &hellip;)</code></p>
+
+    <p><i>Syntax:</i> <code><span class="token">Keyword</span></code>
+      is an
+      identifier, <code><span class="token">formals</span></code> a
+      formal arguments list,
+      and <code><span class="token">transformer</span></code> an
+      expression.</p>
+
+    <p><i>Semantics: </i> This syntax definition is equivalent to
+    the syntax definition</p>
+
+    <pre class="code">
+    (define-syntax <span class="token">keyword</span>
+      (lisp-transformer
+        (lambda (<var>exp</var>)
+          (let-values ((<span class="token">formals</span> (apply values (cdr <var>exp</var>))))
+            <span class="token">body<sub>1</sub></span> <span class="token">body<sub>2</sub></span> &hellip;))))</pre>
+
+    <h4>Syntax parameters</h4>
+
+    <p><code>(define-syntax-parameter <span class="token">keyword</span> <span class="token">expression</span>)</code></p>
+
+    <p>This syntax is defined in SRFI 139.</p>
+
+    <p><code>(syntax-parameterize ((<span class="token">keyword</span> <span class="token">expression</span>) &hellip;) <span class="token">body</span>)</code></p>
+
+    <p>This syntax is defined in SRFI 139.</p>
+
     <h3>Libraries</h3>
 
     <p>An implementation does not have to provide all the libraries
       below.  If it provides a library, it has to provide it as a
       whole and not just a subset of it.</p>
 
+    <h4>The composite library</h4>
+
+    <p><code>(srfi 211)</code></p>
+
+    <p>Exports all identifiers defined in this SRFI.</p>
+
     <h4>The low-level macro facility of the R<sup>4</sup>RS</h4>
 
     <p><code>(srfi 211 low-level)</code></p>
 
-    <p>The low-level macro facility as documented in the third section
-      of the appendix to
-      the <cite><a href="https://people.csail.mit.edu/jaffer/r4rs.pdf">R<sup>4</sup>RS</a></cite>.
-      Exports the identifiers</p>
+    <p>Exports the identifiers</p>
 
     <ul>
-      <li><code>syntax</code></li>
-      <li><code>unwrap-syntax</code></li>
-      <li><code>identifier?</code></li>
-      <li><code>free-identifier=?</code></li>
-      <li><code>bound-identifier=?</code></li>
-      <li><code>identifier-&gt;symbol</code></li>
-      <li><code>generate-identifier</code></li>
-      <li><code>construct-identifier</code></li>
+      <li><code>syntax</code>,</li>
+      <li><code>unwrap-syntax</code>,</li>
+      <li><code>identifier?</code>,</li>
+      <li><code>free-identifier=?</code>,</li>
+      <li><code>bound-identifier=?</code>,</li>
+      <li><code>identifier-&gt;symbol</code>,</li>
+      <li><code>generate-identifier</code>, and</li>
+      <li><code>construct-identifier</code>.</li>
     </ul>
 
     <p><i>Rationale:</i> Although this thirty-year-old low-level macro
@@ -286,47 +664,47 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>In a certain sense, this macro facility
       is <code>syntax-case</code> without <code>syntax-case</code>.</p>
 
-    <p>Compared to the <code>er-macro-transformer</code> facility,
+    <p>Compared to the explicitly renaming facility,
       which is quite comparable to this low-level macro facility, it
       does not assume that abstract syntax objects are Scheme datums
       but enforces the use of <code>unwrap-syntax</code>.  While this
       can be no-op when implemented on top of explicit renaming macro
-      transformers, it is not in the case when implementated on top
+      transformers, it is not in the case when implementated on top of
+      the marks and substitutions implementation
       of <code>syntax-case</code>.  Similarly, it does not assume that
       identifiers that are <code>bound-identifier=?</code> are
       already <code>eq?</code>.  These further abstractions make the
       system compatible to the usual <code>syntax-case</code>
       systems.</p>
 
-    <p>To the <code>er-macro-transformer</code> facility, it adds that
-      a macro transformer can also be given by procedure taking a
-      syntax object and returning a syntax object.  Thanks to the
-      abstract nature of a syntax object, this can be easily achieved
-      by implementations.</p>
+    <p>The system is, in principle, as expressive as
+    the <code>syntax-case</code> system (but without all bells and
+    whistles) and thus more powerful than explicit renaming.</p>
+
+    <p>To the explicitly renaming facility, it adds that a macro
+      transformer can also be given by procedure taking a syntax
+      object and returning a syntax object.  Thanks to the abstract
+      nature of a syntax object, this can be easily achieved by
+      implementations.</p>
 
     <h4>Explicitly renaming macros</h4>
 
     <p><code>(srfi 211 explicit-renaming)</code></p>
 
-    <p>The <code>er-macro-transformer</code> facility as documented by
-      William Clinger
-      in <cite><a
-href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
-      Macros Through Explicit Renaming</a></cite>.
-      Exports the identifiers</p>
+    <p>Exports the identifiers</p>
 
     <ul>
-      <li><code>er-macro-transformer</code></li>
-      <li><code>identifier?</code></li>
+      <li><code>er-macro-transformer</code>, and</li>
+      <li><code>quasi-identifier?</code> as <code>identifier?</code>.</li>
     </ul>
 
-    <p><i>Note 1:</i> Classically, to test whether binding one
-      identifier would also bind the other, the equivalence
-      predicate <code>eqv?</code> is used in the context of explicit
-      renaming macros.  In general, however, this equivalence
-      predicate is too fine as soon as the system is augmented with a
-      means to capture the syntactic environment of an identifier as
-      the following code shows:</p>
+    <p><i>Note 1:</i> In legacy implementations, to test whether
+      binding one identifier would also bind the other, the
+      equivalence predicate <code>eqv?</code> is used in the context
+      of explicit renaming macros.  In general, however, this
+      equivalence predicate is too fine as soon as the system is
+      augmented with a means to capture the syntactic environment of
+      an identifier as the following code shows:</p>
 
     <pre><small>    (let ((x #f))
       (let ((x #f)) ...))</small></pre>
@@ -339,14 +717,14 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
 
     <p>Consequently, macro programmers should
       use <code>bound-identifier=?</code> instead of <code>eqv?</code>
-      whenever one of the library <code>(srfi 211 low-level)</code>
+      whenever one of the libraries <code>(srfi 211 low-level)</code>
       or <code>(srfi 211 syntax-case)</code> is provided as well.</p>
 
-    <p><i>Note 2:</i> Classically, to implement non-hygienic macros,
-      raw symbols are inserted into the macro output in the context of
-      explicit renaming macros.  In general, however, this cannot lead
-      to robust macros in a typical implementation as the following
-      example shows:</p>
+    <p><i>Note 2:</i> In legacy implementations, to implement
+      non-hygienic macros, raw symbols are inserted into the macro
+      output in the context of explicit renaming macros.  In general,
+      however, this cannot lead to robust macros in a typical
+      implementation as the following example shows:</p>
 
     <pre><small>    (define-syntax loop
       (er-macro-transformer
@@ -389,163 +767,149 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
       which should have renamed <code>exit</code> in the context of
       the macro invoking it.</p>
 
-    <p>Consequentely, macro programmers should not insert raw symbols
-      in the macro output, but use <code>construct-identifier</code>
-      from <code>(srfi 211 low-level)</code>
-      or <code>datum-&gt;syntax</code> from <code>(srfi 211
-      syntax-case)</code> when any of these two libraries is
-      provided as well.</p>
+    <p>Consequently, in legacy implementations, macro programmers
+      should not return raw symbols from their transformers, but
+      use <code>construct-identifier</code> from <code>(srfi 211
+      low-level)</code> or <code>datum-&gt;syntax</code>
+      from <code>(srfi 211 syntax-case)</code> when any of these two
+      libraries is provided as well.</p>
 
-    <p><i>Note 3:</i> It is generally an error if
-      the <var>rename</var> procedure is applied to a non-symbol or if
-      the <var>compare</var> procedure is applied to non-identifiers.
+    <p><i>Note 3:</i> In legacy implementations, it may be an error if
+      the <var>rename</var> procedure is applied to a non-symbol.  It
+      is an error if the <var>compare</var> procedure is applied to
+      non-quasi-identifiers.
     </p>
 
-    <p><i>Note 4:</i> In view of the above, it is recommended
+    <p><i>Note 4:</i> In view of the above, this specification demands
       that <code>er-macro-transformer</code> is implemented in a way
       so that raw symbols in the output are closed in the syntactic
       environment of the invoking macro keyword.  Furthemore, it is
-      recommended that the <code>rename</code> procedure accepts
+      demanded that the <code>rename</code> procedure accepts
       arbitrary datums representing Scheme code and that
       the <code>compare</code> procedure closes raw symbols in the
       syntactic environment of the invoking macro keyword.</p>
+
+    <h4>Implicitly renaming macros</h4>
+
+    <p><code>(srfi 211 implicit-renaming)</code></p>
+
+    <p>Exports the identifier</p>
+
+    <ul>
+      <li><code>ir-macro-transformer</code>.</li>
+    </ul>
+
+    <p><i>Note: </i> Most of the notes to explicitly renaming
+    apply <i>mutatis mutandis</i> here as well.</p>
 
     <h4>The <code>syntax-case</code> system</h4>
 
     <p><code>(srfi 211 syntax-case)</code></p>
 
-    <p>The <code>syntax-case</code> system as documented in
-      the <cite><a href="http://www.r6rs.org">R<sup>6</sup>RS</a></cite>.
-      Exports the identifiers</p>
+    <p>Exports the identifiers</p>
 
     <ul>
-      <li><code>syntax-case</code></li>
-      <li><code>syntax</code></li>
-      <li><code>identifier?</code></li>
-      <li><code>bound-identifier=?</code></li>
-      <li><code>free-identifier=?</code></li>
-      <li><code>syntax-&gt;datum</code></li>
-      <li><code>datum-&gt;syntax</code></li>
-      <li><code>generate-temporaries</code></li>
-      <li><code>with-syntax</code></li>
-      <li><code>quasisyntax</code></li>
-      <li><code>unsyntax</code></li>
-      <li><code>unsyntax-splicing</code></li>
-      <li><code>syntax-violation</code></li>
+      <li><code>syntax-case</code>,</li>
+      <li><code>syntax</code>,</li>
+      <li><code>identifier?</code>,</li>
+      <li><code>bound-identifier=?</code>,</li>
+      <li><code>free-identifier=?</code>,</li>
+      <li><code>syntax-&gt;datum</code>,</li>
+      <li><code>datum-&gt;syntax</code>,</li>
+      <li><code>generate-temporaries</code>,</li>
+      <li><code>with-syntax</code>,</li>
+      <li><code>quasisyntax</code>,</li>
+      <li><code>unsyntax</code>,</li>
+      <li><code>unsyntax-splicing</code>, and</li>
+      <li><code>syntax-violation</code>.</li>
     </ul>
 
-    <p><i>Note:</i> <code>Syntax-case</code> shall
+    <p><i>Note:</i> As <code>syntax-case</code> must
       accept <code>...</code> and <code>_</code> as literal
-      identifiers.</p>
+      identifiers, <code>syntax-case</code> exported by <code>(srfi 211 syntax-case)</code> cannot be the same as <code>syntax-case</code> exported by <code>(rnrs syntax-case (6))</code>.</p>
 
     <h4>Identifier syntax</h4>
 
     <p><code>(srfi 211 identifier-syntax)</code></p>
 
-    <p>The <code>identifier-syntax</code> transformer documented in
-      the <cite>R<sup>6</sup>RS</cite>.  If this library is present, a
-      macro transformer will be invoked if its associated keyword is
-      referenced as an expression.  The more general form
-      of <code>identifier-syntax</code> that permits the transformer
-      to determine what happens when <code>set!</code> is used may not
-      be available unless the <code>(srfi 211
-      variable-transformer)</code> library is present as well.
-      Exports the identifier</p>
+    <p>Exports the identifier</p>
 
     <ul>
-      <li><code>identifier-syntax</code></li>
+      <li><code>identifier-syntax</code>.</li>
     </ul>
+
+    <p><i>Note:</i> If this library is present, a macro transformer
+      will be invoked if its associated keyword is referenced as an
+      expression.  The more general form
+      of <code>identifier-syntax</code> that permits the transformer
+      to determine what happens when <code>set!</code> is used may not
+      be supported by legacy implementations unless the <code>(srfi
+      211 variable-transformer)</code> library is present as well.</p>
 
     <h4>Variable transformers</h4>
 
     <p><code>(srfi 211 variable-transformer)</code></p>
 
-    <p>The <em>variable transformer</em> facility as documented in the
-    <cite>R<sup>6</sup>RS</cite>.  Exports the identifier</p>
+    <p>Exports the identifier</p>
 
     <ul>
-      <li><code>make-variable-transformer</code></li>
+      <li><code>make-variable-transformer</code>.</li>
     </ul>
 
     <h4>Custom ellipsis identifiers</h4>
 
     <p><code>(srfi 211 with-ellipsis)</code></p>
 
-    <p>The <code>(srfi 211 with-ellipsis)</code> library exports the syntax</p>
+    <p>Exports the identifier</p>
 
     <ul>
-      <li><code>with-ellipsis</code></li>
+      <li><code>with-ellipsis</code>.</li>
     </ul>
-
-    <p>as described above.</p>
 
     <h4>Syntax parameters</h4>
 
     <p><code>(srfi 211 syntax-parameter)</code></p>
 
-    <p>Syntax parameters as documented
-      by <a href="https://srfi.schemers.org/srfi-139/srfi-139.html">SRFI
-      139</a>.  Exports the identifiers</p>
+    <p>Exports the identifiers</p>
 
     <ul>
-      <li><code>define-syntax-parameter</code></li>
-      <li><code>syntax-parameterize</code></li>
+      <li><code>define-syntax-parameter</code> and </li>
+      <li><code>syntax-parameterize</code>.</li>
     </ul>
-
-    <h4>Implicitly renaming macros</h4>
-
-    <p><code>(srfi 211 implicit-renaming)</code></p>
-
-    <p>The <code>ir-macro-transformer</code>
-    facility <a href="https://wiki.call-cc.org/man/4/Macros#ir-macro-transformer">as
-        documented by CHICKEN</a>.  Exports the identifier</p>
-
-    <ul>
-      <li>ir-macro-transformer</li>
-    </ul>
-
-    <h4>Syntactic-closures macro transformers</h4>
-
-    <p><code>(srfi 211 syntactic-closures)</code></p>
-
-    <p>The <code>sc-macro-transformer</code>
-      facility <a href="https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/Syntactic-Closures.html#Syntactic-Closures">as
-	documented by MIT/GNU Scheme</a>.  Exports the identifiers</p>
-
-    <ul>
-      <li><code>sc-macro-transformer</code></li>
-      <li><code>rsc-macro-transformer</code></li>
-      <li><code>make-syntactic-closure</code></li>
-      <li><code>close-syntax</code></li>
-      <li><code>capture-syntactic-environment</code></li>
-      <li><code>identifier?</code></li>
-      <li><code>identifier=?</code></li>
-      <li><code>make-synthetic-identifier</code></li>
-    </ul>
-
-    <p><i>Note:</i> Depending on whether the underlying low-system can
-      interpret raw symbols as identifiers, the
-      predicate <code>identifier?</code> may either
-      return <code>#t</code> or <code>#f</code> when applied to symbols.</p>
 
     <h4>Old-style Lisp macros</h4>
 
     <p><code>(srfi 211 define-macro)</code></p>
 
-    <p>The <code>(srfi 211 define-macro)</code> library exports the identifiers</p>
+    <p>Exports the identifiers</p>
 
     <ul>
-      <li><code>define-macro</code></li>
-      <li><code>lisp-transformer</code></li>
+      <li><code>define-macro</code>, and</li>
+      <li><code>lisp-transformer</code>.</li>
     </ul>
 
-    <p>as described above.</p>
-
-    <p><i>Note: </i> An implementation that does not
+    <p><i>Note: </i> A legacy implementation that does not
       support <code>define-syntax</code>,
-      <code>let-syntax</code>, or <code>letrec-syntax</code> need not
+      <code>let-syntax</code>, and <code>letrec-syntax</code> need not
       define <code>lisp-transformer</code>.
     </p>
+
+    <h4>Syntactic-closures macro transformers</h4>
+
+    <p><code>(srfi 211 syntactic-closures)</code></p>
+
+    <p>Exports the identifiers</p>
+
+    <ul>
+      <li><code>sc-macro-transformer</code>,</li>
+      <li><code>rsc-macro-transformer</code>,</li>
+      <li><code>make-syntactic-closure</code>,</li>
+      <li><code>close-syntax</code>,</li>
+      <li><code>capture-syntactic-environment</code>,</li>
+      <li><code>quasi-identifier?</code> as <code>identifier?</code>,</li>
+      <li><code>sc-identifier=?</code> as <code>identifier=?</code>, and</li>
+      <li><code>make-synthetic-identifier</code>.</li>
+    </ul>
 
     <h2 id="implementation">Implementation</h2>
 
@@ -583,10 +947,16 @@ href="http://mumble.net/~campbell/tmp/clinger91exrename.pdf">Hygienic
     <p>Alex Shinn came up with the final title of this SRFI.</p>
 
     <p>Thanks to John Cowan and Alex Shinn for their insistence to
-    make this SRFI as much as independent from external sources.</p>
+    make this SRFI as much as independent from non-stable external
+    sources.</p>
+
+    <p>Wording has been taken from the R<sup>6</sup>RS, the
+    R<sup>7</sup>RS,
+    and <cite><a href="https://srfi.schemers.org/srfi-93/srfi-93.html">R6RS
+    Syntax-Case Macros</a></cite>.</p>
 
     <h2 id="copyright">Copyright</h2>
-    <p>&copy; 2020 Marc Nieper-Wißkirchen.</p>
+    <p>&copy; 2021 Marc Nieper-Wißkirchen.</p>
 
     <p>
       Permission is hereby granted, free of charge, to any person
