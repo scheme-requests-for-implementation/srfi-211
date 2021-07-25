@@ -51,7 +51,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <h2 id="abstract">Abstract</h2>
 
     <p>This SRFI describes common syntactic extensions of the <code>syntax-rules</code> macro facility of R5RS and the base R6RS and R7RS libraries.  In particular,
-      library name spaces are defined where these extensions can be located
+      library namespaces are defined where these extensions can be located
       and which can be tested against in <code>cond-expand</code> forms.
     </p>
 
@@ -64,7 +64,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>Various Scheme implementations define extensions to
       the <code>syntax-rules</code> macro facility that can be found
       in <a href="https://small.r7rs.org/">R<sup>7</sup>RS</a>, for
-      example explicit renaming macros, <code>syntax-case</code>,
+      example explicit-renaming macros, <code>syntax-case</code>,
       identifier macros or variable transformers.  While different
       implementation of the same extension will usually be compatible,
       they cannot usually be found under the same namespace.</p>
@@ -72,8 +72,8 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>This SRFI therefore defines a number of standard libraries
       under which supporting implementations export the identifiers of
       those <code>syntax-rules</code> extensions they implement so
-      that portable code can be written without explicit loading
-      implementation specific libraries.
+      that portable code can be written without explicitly loading
+      implementation-specific libraries.
     </p>
 
     <h3>Example</h3>
@@ -150,7 +150,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>A <dfn>transformer</dfn> is a transformation procedure or a
       variable transformer as in section 12.3 of the R<sup>6</sup>RS
-      Standard Libraries, or an <em>explicitly renaming
+      Standard Libraries, or an <em>explicit-renaming
 	transformer</em>, an <em>implicitly renaming transformer</em>,
       a <em>syntactic closures transformer</em>, or a <em>Lisp
 	transformer</em>.</p>
@@ -159,7 +159,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>In the context of a transformer being applied to transcribe a macro use of a
       keyword, <dfn>injecting</dfn> a symbol results in an identifier with
-      the same name that behaves as if it was introduced into the code
+      the same name that behaves as if it were introduced into the code
       where the keyword was used.</p>
 
     <p>In the same context, <dfn>renaming</dfn> a symbol results in an
@@ -209,8 +209,8 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>The procedure <code>quasi-syntax-&gt;datum</code> strips all
     syantactic information from the quasi-syntax
     object <code><var>obj</var></code> and returns the corresponding
-    Scheme datum.  The difference to <code>syntax-&gt;datum</code> is
-    that symbols at the leaves are explicitly allowed and which are
+    Scheme datum.  The difference from <code>syntax-&gt;datum</code> is
+    that symbols at the leaves are explicitly allowed and are
     converted to themselves.</p>
 
     <p><code>(identifier-&gt;symbol <var>id</var>)</code></p>
@@ -228,8 +228,8 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>The procedure <code>quasi-identifier-&gt;symbol</code> returns
     the symbolic name of the identifier <code><var>id</var></code>.
-    The difference to <code>syntax-&gt;datum</code> is that symbols
-      are allowed and which are their own symbolic name.</p>
+    The difference from <code>syntax-&gt;datum</code> is that symbols
+    are allowed and are converted to their own symbolic names.</p>
 
     <p><code>(unwrap-syntax <code>obj</code>)</code></p>
 
@@ -300,7 +300,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>The <code>make-variable-transformer</code> procedure behaves as
       defined in section 12.3 of the R<sup>6</sup>RS Standard
       Libraries, except that <code><var>transformer</var></code> can
-      be a transformation procedure, an explicitly renaming
+      be a transformation procedure, an explicit-renaming
       transformer, an implicitly renaming transformer,
       a syntactic closures transformer, or a Lisp
       transformer.</p>
@@ -311,7 +311,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       procedure accepting a single argument.</p>
 
     <p>The <code>er-macro-transformer</code> procedure returns an
-      explicitly renaming transformer such that each use of a macro
+      explicit-renaming transformer such that each use of a macro
       whose keyword is associated with it is transcribed in the
       following way:</p>
 
@@ -529,7 +529,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     in <code>(<span class="token">literal</span> &hellip;)</code>.  If
     the ellipsis or underscore appear
     in <code>(<span class="token">literal</span> &hellip;)</code>,
-    they are treated as a literal identifier.</p>
+    they are treated as literal identifiers.</p>
 
     <p><i>Rationale:</i> This extension to
       R<sup>6</sup>RS's <code>syntax-case</code> is necessary so that
@@ -656,7 +656,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       facility is usually not mentioned when talking about macro
       systems, it has the advantage that it is on the one hand simple
       and abstract enough to serve as a common denominator between
-      Schemes that have explicit renaming macro transformers and
+      Schemes that have explicit-renaming macro transformers and
       Schemes that have <code>syntax-case</code> and on the other hand
       powerful enough so that it can define <code>syntax-rules</code>
       as a macro.</p>
@@ -664,11 +664,11 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>In a certain sense, this macro facility
       is <code>syntax-case</code> without <code>syntax-case</code>.</p>
 
-    <p>Compared to the explicitly renaming facility,
+    <p>Compared to the explicit-renaming facility,
       which is quite comparable to this low-level macro facility, it
       does not assume that abstract syntax objects are Scheme datums
       but enforces the use of <code>unwrap-syntax</code>.  While this
-      can be no-op when implemented on top of explicit renaming macro
+      can be no-op when implemented on top of explicit-renaming macro
       transformers, it is not in the case when implementated on top of
       the marks and substitutions implementation
       of <code>syntax-case</code>.  Similarly, it does not assume that
@@ -681,13 +681,13 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     the <code>syntax-case</code> system (but without all bells and
     whistles) and thus more powerful than explicit renaming.</p>
 
-    <p>To the explicitly renaming facility, it adds that a macro
+    <p>To the explicit-renaming facility, it adds that a macro
       transformer can also be given by procedure taking a syntax
       object and returning a syntax object.  Thanks to the abstract
       nature of a syntax object, this can be easily achieved by
       implementations.</p>
 
-    <h4>Explicitly renaming macros</h4>
+    <h4>Explicit-renaming macros</h4>
 
     <p><code>(srfi 211 explicit-renaming)</code></p>
 
@@ -701,7 +701,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p><i>Note 1:</i> In legacy implementations, to test whether
       binding one identifier would also bind the other, the
       equivalence predicate <code>eqv?</code> is used in the context
-      of explicit renaming macros.  In general, however, this
+      of explicit-renaming macros.  In general, however, this
       equivalence predicate is too fine as soon as the system is
       augmented with a means to capture the syntactic environment of
       an identifier as the following code shows:</p>
@@ -722,7 +722,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p><i>Note 2:</i> In legacy implementations, to implement
       non-hygienic macros, raw symbols are inserted into the macro
-      output in the context of explicit renaming macros.  In general,
+      output in the context of explicit-renaming macros.  In general,
       however, this cannot lead to robust macros in a typical
       implementation as the following example shows:</p>
 
@@ -799,7 +799,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <li><code>ir-macro-transformer</code>.</li>
     </ul>
 
-    <p><i>Note: </i> Most of the notes to explicitly renaming
+    <p><i>Note: </i> Most of the notes to explicit renaming
     apply <i>mutatis mutandis</i> here as well.</p>
 
     <h4>The <code>syntax-case</code> system</h4>
