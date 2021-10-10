@@ -895,6 +895,15 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       define <code>lisp-transformer</code>.
     </p>
 
+    <p><i>Remark:</i> The syntax and procedures defined by the
+      library <code>(srfi 211 define-macro)</code> should be
+      considered deprecated.  Their use is only recommended by code
+      that needs to be compatible with Scheme implementations lacking
+      a working hygienic macro facility and for demonstration or
+      educational purposes.  Scheme implementations that have a
+      working hygienic macro facility are even encouraged not to ship
+      with this library by default.</p>
+
     <h4>Syntactic-closures macro transformers</h4>
 
     <p><code>(srfi 211 syntactic-closures)</code></p>
