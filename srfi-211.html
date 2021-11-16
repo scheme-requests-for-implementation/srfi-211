@@ -343,6 +343,18 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <code><var>id<sub>1</sub></var></code>
       and <code><var>id<sub>2</sub></var></code>.</p>
 
+    <p><i>Note:</i> In the preceding
+      paragraphs, <code>er-macro-transformer</code> is defined through
+      an (informally given) operational semantics.  This does not mean
+      that <code>er-macro-transformer</code> has to be implemented by
+      following each step of the operational semantics.  Any
+      implementation is correct as long as it behaves operationally
+      equivalent.  This is like <code>syntax-case</code> is defined in
+      the R<sup>6</sup>RS through Kent Dybvig's, Robert Hieb's, and
+      Carl Bruggeman's <em>marks and substitutions</em> algorithm but
+      does not preclude other algorithms like the one implemented by
+      André van Tonder in Larceny.</p>
+
     <p><code>(ir-macro-transformer <var>proc</var>)</code></p>
 
     <p>It is an error if <code><var>proc</var></code> is not a
