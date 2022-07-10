@@ -446,9 +446,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p>These macro uses are defined in section 9.2 of the R<sup>6</sup>RS.</p>
 
     <p><i>Note:</i> Every implementation must support the first form
-    of a macro use and should support all four forms.  It must the
-    third form if it provides <code>identifier-syntax</code>, it must
-    support the third and fourth form if it
+    of a macro use and should support all four forms.  It must support
+    the third form if it provides <code>identifier-syntax</code>, it
+    must support the third and fourth form if it
     provides <code>make-variable-transformer</code>, and it must
     support all four forms if it
     provides <code>syntax-case</code>.</p>
@@ -937,6 +937,19 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <li><code>preidentifier?</code> as <code>identifier?</code>,</li>
       <li><code>sc-identifier=?</code> as <code>identifier=?</code>, and</li>
       <li><code>make-synthetic-identifier</code>.</li>
+    </ul>
+
+    <h4>Presyntax objects</h4>
+
+    <p><code>(srfi 211 presyntax)</code></p>
+
+    <p>Exports the identifiers</p>
+
+    <ul>
+      <li><code>preidentifier?</code>,</li>
+      <li><code>presyntax-&gt;datum</code>,</li>
+      <li><code>preidentifier-&gt;symbol</code>, and</li>
+      <li><code>unwrap-presyntax</code>.</li>
     </ul>
 
     <h2 id="implementation">Implementation</h2>
