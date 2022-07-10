@@ -83,15 +83,15 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       macro <code>skip</code>.  The arguments of the <code>skip</code>
       macro are a non-negative exact integer <em>n</em> and a number
       of body forms.  A <code>skip</code> macro is evaluated by
-      dropping the first <em>n</em> n body forms and evaluating the
+      dropping the first <em>n</em> body forms and evaluating the
       rest as a body.</p>
 
     <p>Writing such a macro is not possible
       with <code>syntax-rules</code>, but it is possible both
       with <code>er-macro-transformer</code>
-      and <code>syntax-case</code>.  With the following code, the
-      library works on all implementations that support at
-      least <code>er-macro-transformer</code>
+      and <code>syntax-case</code>.  With the following
+      R<sup>7</sup>RS code, the library works on all implementations
+      that support at least <code>er-macro-transformer</code>
       or <code>syntax-case</code>, and this SRFI, of course.</p>
 
     <pre><small>    (define-library (skip)
@@ -130,21 +130,21 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     defined as in section 12.2 of the R<sup>6</sup>RS Standard
     Libraries.</p>
 
-    <h3>Quasi-syntax objects</h3>
+    <h3>Presyntax objects</h3>
 
-    <p>A <dfn>quasi-syntax object</dfn> is a generalization of a
+    <p>A <dfn>presyntax object</dfn> is a generalization of a
     syntax object that allows symbols at its leaves.  More precisely,
-      a quasi-syntax object is
+      a presyntax object is
 
     <ul>
-      <li>a pair or list of quasi-syntax objects,</li>
-      <li>a vector of quasi-syntax objects,</li>
+      <li>a pair or list of presyntax objects,</li>
+      <li>a vector of presyntax objects,</li>
       <li>a constant,</li>
       <li>a wrapped syntax object, or</li>
       <li>a symbol.</li>
     </ul>
 
-    <p>A <dfn>quasi-identifier</dfn> is a value that is either an
+    <p>A <dfn>preidentifier</dfn> is a value that is either an
     identifier or a symbol.</p>
 
     <h3>Transformers</h3>
@@ -167,10 +167,10 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       identifier with the same name that behaves as if it were
       introduced into the code where the keyword was defined.</p>
 
-    <p>In the same context, the <dfn>injection</dfn> of a quasi-syntax
+    <p>In the same context, the <dfn>injection</dfn> of a presyntax
       object is a syntax object recursively built from it by replacing
       each symbol at the leaves with its injection, and
-      the <dfn>renaming</dfn> of quasi-syntax object is a syntax
+      the <dfn>renaming</dfn> of presyntax object is a syntax
       object recursively build from it by replacing each symbol at the
       leaves with its renaming.  Both the injection and the renaming
       preserve any shared or cyclic structure.</p>
@@ -183,9 +183,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>This procedure is defined in section 12.5 of the R<sup>6</sup>RS Standard Libraries.</p>
 
-    <p><code>(quasi-identifier? <var>obj</var>)</code></p>
+    <p><code>(preidentifier? <var>obj</var>)</code></p>
 
-    <p>The <code>quasi-identifier?</code> procedure
+    <p>The <code>preidentifier?</code> procedure
     returns <code>#t</code> if <code><var>obj</var></code> is either
     an identifier or a symbol, and <code>#f</code> otherwise.</p>
 
@@ -203,12 +203,12 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <p>This procedure is defined in section 12.6 of the R<sup>6</sup>RS Standard Libraries.</p>
 
-    <p><code>(quasi-syntax-&gt;datum <var>obj</var>)</code></p>
+    <p><code>(presyntax-&gt;datum <var>obj</var>)</code></p>
 
-    <p>It is an error if <code><var>obj</var></code> is not a quasi-syntax object.</p>
+    <p>It is an error if <code><var>obj</var></code> is not a presyntax object.</p>
 
-    <p>The procedure <code>quasi-syntax-&gt;datum</code> strips all
-    syantactic information from the quasi-syntax
+    <p>The procedure <code>presyntax-&gt;datum</code> strips all
+    syntactic information from the presyntax
     object <code><var>obj</var></code> and returns the corresponding
     Scheme datum.  The difference from <code>syntax-&gt;datum</code> is
     that symbols at the leaves are explicitly allowed and are
@@ -223,11 +223,11 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     i.e. the result of applying <code>syntax-&gt;datum</code>
     to <code><var>id</var></code>.
 
-    <p><code>(quasi-identifier-&gt;symbol <var>id</var>)</code></p>
+    <p><code>(preidentifier-&gt;symbol <var>id</var>)</code></p>
 
-    <p>It is an error if <code><var>id</var></code> is not a quasi-identifier.</p>
+    <p>It is an error if <code><var>id</var></code> is not a preidentifier.</p>
 
-    <p>The procedure <code>quasi-identifier-&gt;symbol</code> returns
+    <p>The procedure <code>preidentifier-&gt;symbol</code> returns
     the symbolic name of the identifier <code><var>id</var></code>.
     The difference from <code>syntax-&gt;datum</code> is that symbols
     are allowed and are converted to their own symbolic names.</p>
@@ -242,12 +242,12 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       If <code><var>obj</var></code> is a wrapped syntax
       object, <code>unwrap-syntax</code> returns the underlying unwrapped syntax object.</p>
 
-    <p><code>(unwrap-quasi-syntax <code>obj</code>)</code></p>
+    <p><code>(unwrap-presyntax <code>obj</code>)</code></p>
 
-    <p>It is an error if <code><var>obj</var></code> is not a quasi-syntax object.</p>
+    <p>It is an error if <code><var>obj</var></code> is not a presyntax object.</p>
 
-    <p>If <code><var>obj</var></code> is a quasi-identifier or an
-      unwrapped quasi-syntax object, the procedure <code>unwrap-syntax</code>
+    <p>If <code><var>obj</var></code> is a preidentifier or an
+      unwrapped presyntax object, the procedure <code>unwrap-syntax</code>
       returns <code><var>obj</var></code> unchanged.
       If <code><var>obj</var></code> is a wrapped syntax
       object, <code>unwrap-syntax</code> returns the underlying
@@ -322,13 +322,13 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       arguments, the fully unwrapped input form and two
       procedures <code><var>rename</var></code>
       and <code><var>compare</var></code>.  It is an error if it does
-      not return a quasi-syntax object.  The symbols at the leaves of
-      the quasi-syntax object returned are then replaced by their
+      not return a presyntax object.  The symbols at the leaves of
+      the presyntax object returned are then replaced by their
       injections to yield the output form as a syntax object.</p>
 
     <p>The <code><var>rename</var></code> procedure accepts a single
       argument <code><var>expr</var></code>.  It is an error
-      if <code><var>expr</var></code> is not a quasi-syntax
+      if <code><var>expr</var></code> is not a presyntax
       object.  <code><var>Rename</var></code> returns a syntax object
       that is built from <code><var>expr</var></code> by replacing the
       symbols at the leaves by their renamings.  This syntax object
@@ -338,7 +338,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <code><var>id<sub>1</sub></var></code>
       and <code><var>id<sub>2</sub></var></code>.  It is an error if
       the <code><var>ids</var></code> are not
-      quasi-identifiers.  <code><var>Compare</var></code>
+      preidentifiers.  <code><var>Compare</var></code>
       returns the result of <code>free-identifier=?</code> applied to the injections of
       <code><var>id<sub>1</sub></var></code>
       and <code><var>id<sub>2</sub></var></code>.</p>
@@ -359,13 +359,13 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       arguments, the fully unwrapped input form and two
       procedures <code><var>inject</var></code>
       and <code><var>compare</var></code>.  It is an error if it does
-      not return a quasi-syntax object.  The symbols at the leaves of
-      the quasi-syntax object returned are then replaced by their
+      not return a presyntax object.  The symbols at the leaves of
+      the presyntax object returned are then replaced by their
       renamings to yield the output form as a syntax object.</p>
 
     <p>The <code><var>inject</var></code> procedure accepts a single
       argument <code><var>expr</var></code>.  It is an error
-      if <code><var>expr</var></code> is not a quasi-syntax
+      if <code><var>expr</var></code> is not a presyntax
       object.  <code><var>Inject</var></code> returns a syntax object
       that is built from <code><var>expr</var></code> by replacing the
       symbols at the leaves by their injections.  This syntax object
@@ -375,7 +375,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <code><var>id<sub>1</sub></var></code>
       and <code><var>id<sub>2</sub></var></code>.  It is an error if
       the <code><var>ids</var></code> are not
-      quasi-identifiers.  <code><var>Compare</var></code> returns the
+      preidentifiers.  <code><var>Compare</var></code> returns the
       result of <code>free-identifier=?</code> applied to the
       renamings of
       <code><var>id<sub>1</sub></var></code>
@@ -696,7 +696,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <ul>
       <li><code>er-macro-transformer</code>, and</li>
-      <li><code>quasi-identifier?</code> as <code>identifier?</code>.</li>
+      <li><code>preidentifier?</code> as <code>identifier?</code>.</li>
     </ul>
 
     <p><i>Note 1:</i> In legacy implementations, to test whether
@@ -778,7 +778,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p><i>Note 3:</i> In legacy implementations, it may be an error if
       the <var>rename</var> procedure is applied to a non-symbol.  It
       is an error if the <var>compare</var> procedure is applied to
-      non-quasi-identifiers.
+      non-preidentifiers.
     </p>
 
     <p><i>Note 4:</i> In view of the above, this specification demands
@@ -895,14 +895,20 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       define <code>lisp-transformer</code>.
     </p>
 
+    <p><i>Note: </i> A legacy implementation that does not
+      support <code>define-syntax</code>,
+      <code>let-syntax</code>, and <code>letrec-syntax</code> need not
+      define <code>lisp-transformer</code>.
+    </p>
+
     <p><i>Remark:</i> The syntax and procedures defined by the
       library <code>(srfi 211 define-macro)</code> should be
       considered deprecated.  Their use is only recommended by code
       that needs to be compatible with Scheme implementations lacking
       a working hygienic macro facility and for demonstration or
       educational purposes.  Scheme implementations that have a
-      working hygienic macro facility are even encouraged not to ship
-      with this library by default.</p>
+      working hygienic macro facility are even encouraged not to provide
+      this library by default.</p>
 
     <h4>Syntactic-closures macro transformers</h4>
 
@@ -916,7 +922,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       <li><code>make-syntactic-closure</code>,</li>
       <li><code>close-syntax</code>,</li>
       <li><code>capture-syntactic-environment</code>,</li>
-      <li><code>quasi-identifier?</code> as <code>identifier?</code>,</li>
+      <li><code>preidentifier?</code> as <code>identifier?</code>,</li>
       <li><code>sc-identifier=?</code> as <code>identifier=?</code>, and</li>
       <li><code>make-synthetic-identifier</code>.</li>
     </ul>
