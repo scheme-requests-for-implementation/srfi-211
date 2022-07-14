@@ -354,7 +354,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       whose keyword is associated with it is transcribed in the
       following way:</p>
 
-    <p>At first, the input form is recursively fully unwrapped
+    <p>At first, the input form is recursively fully unwrapped,
       preserving any shared or cyclic structure.
       Then <code><var>proc</var></code> is called with three
       arguments, the fully unwrapped input form and two
@@ -387,7 +387,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       that <code>er-macro-transformer</code> has to be implemented by
       following each step of the operational semantics.  Any
       implementation is correct as long as it behaves operationally
-      equivalent.  This is like <code>syntax-case</code> is defined in
+      equivalently.  This is like <code>syntax-case</code> is defined in
       the R<sup>6</sup>RS through Kent Dybvig's, Robert Hieb's, and
       Carl Bruggeman's <em>marks and substitutions</em> algorithm but
       does not preclude other algorithms like the one implemented by
@@ -403,7 +403,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       whose keyword is associated with it is transcribed in the
       following way:</p>
 
-    <p>At first, the input form is recursively fully unwrapped
+    <p>At first, the input form is recursively fully unwrapped,
       preserving any shared or cyclic structure.
       Then <code><var>proc</var></code> is called with three
       arguments, the fully unwrapped input form and two
@@ -444,7 +444,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h4>Syntactic closures</h4>
 
-    <p>The following procedures are mentioned without given any
+    <p>The following procedures are mentioned without being given any
       semantics.  The reason is that the usual semantics as given in
       the MIT/GNU Scheme manual doesn't allow the definition of robust
       unhygienic macros.  (The reasons for that are similar to those
@@ -459,7 +459,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       implemented an extended version of syntactic closures compatible
       with <code>syntax-case</code> in his Unsyntax Scheme, but this
       extension is incompatible with the canonical
-      implementation <code>syntax-rules</code> with syntactic
+      implementation of <code>syntax-rules</code> with syntactic
       closures, which, in turn, is incompatible with robust unhygienic
       syntactic closure macros.</p>
 
@@ -600,7 +600,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       R7RS's <code>syntax-rules</code> can be <em>easily</em> defined in
       terms of <code>syntax-case</code>.</p>
 
-    <p><i>Note 1:</i> The author of this SRFI believes that the exlusion
+    <p><i>Note 1:</i> The author of this SRFI believes that the exclusion
     of the ellipsis and the underscore in the list of literal
     identifiers was a mistake of the R<sup>6</sup>RS.</p>
 
@@ -733,7 +733,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       does not assume that abstract syntax objects are Scheme datums
       but enforces the use of <code>unwrap-syntax</code>.  While this
       can be no-op when implemented on top of explicit-renaming macro
-      transformers, it is not in the case when implementated on top of
+      transformers, it is not in the case when implemented on top of
       the marks and substitutions implementation
       of <code>syntax-case</code>.  Similarly, it does not assume that
       identifiers that are <code>bound-identifier=?</code> are
@@ -847,7 +847,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
     <p><i>Note 4:</i> In view of the above, this specification demands
       that <code>er-macro-transformer</code> is implemented in a way
       so that raw symbols in the output are closed in the syntactic
-      environment of the invoking macro keyword.  Furthemore, it is
+      environment of the invoking macro keyword.  Furthermore, it is
       demanded that the <code>rename</code> procedure accepts
       arbitrary datums representing Scheme code and that
       the <code>compare</code> procedure closes raw symbols in the
@@ -969,7 +969,7 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       considered deprecated.  Their use is only recommended by code
       that needs to be compatible with Scheme implementations lacking
       a working hygienic macro facility and for demonstration or
-      educational purposes.  Scheme implementations that have a
+      educational purposes.  Scheme implementations that do have a
       working hygienic macro facility are even encouraged not to provide
       this library by default.</p>
 
