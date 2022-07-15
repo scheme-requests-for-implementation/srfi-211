@@ -51,18 +51,24 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
 
     <h2>Note</h2>
 
-    <p>After a very long time of thinking about this SRFI, its author
-      has finally decided to withdraw it.  The main reasons for why he
-      thinks that this is the best decision are the following ones:</p>
+    <p>This SRFI was in draft state for a very long time.  The main
+      reason for that was that the author of this SRFI was torn
+      between getting it finalized or withdrawing it.  The main
+      reasons that spoke for withdrawal are summarized below.  In
+      spite of this, the author finally decided to ask the SRFI editor
+      for finalization because members of the Scheme community
+      expressed their opinion that this SRFI would serve the community
+      more in finalized instead of withdrawn status.</p>
+
     <ul>
       <li><p>The abbreviation SRFI stands for <em>Scheme Request for
             Implementation</em>.  It is, however, probably not a good
           idea to implement those parts of this SRFI that haven't
-          already been specified elsewhere.  This SRFI was a proof
+          already been specified elsewhere.  This SRFI is a proof
           of concept that explicit-renaming macros can be made
           compatible with <code>syntax-case</code> and can borrow
           the power of the latter to make robust unhygienic macros
-          possible, the resulting system is, however, slower and
+          possible.  The resulting system is, however, slower and
           still less comfortable that the <code>syntax-case</code>
           system, so implementations should rather be motivated to
           implement <code>syntax-case</code> instead of trying to
@@ -436,35 +442,48 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI logo"
       the datum resulting from invoking <code><var>proc</var></code>
       on the datum representing the macro use.</p>
 
-    <p><code>(sc-macro-transformer <var>proc</var>)</code></p>
+    <h4>Syntactic closures</h4>
 
-    <p><i>TBD</i></p>
+    <p>The following procedures are mentioned without given any
+      semantics.  The reason is that the usual semantics as given in
+      the MIT/GNU Scheme manual doesn't allow the definition of robust
+      unhygienic macros.  (The reasons for that are similar to those
+      why the unmodified explicit-renaming system is unsuitable for
+      unhygienic macros.)</p>
+
+    <p>However, while it is clear (as this SRFI shows) how to extend
+      the explicit-renaming facility so that it becomes compatible
+      with <code>syntax-case</code> and allows robust unhygienic
+      macros, a universally accepted solution for syntactic closures
+      hasn't been proposed yet.  The author of this SRFI has
+      implemented an extended version of syntactic closures compatible
+      with <code>syntax-case</code> in his Unsyntax Scheme, but this
+      extension is incompatible with the canonical
+      implementation <code>syntax-rules</code> with syntactic
+      closures, which, in turn, is incompatible with robust unhygienic
+      syntactic closure macros.</p>
+
+    <p>Regardless, the names of the procedures forming the syntactic
+      closures facility are given here so that the exports
+      of <code>(srfi 211 syntactic-closures)</code> are fixed.
+      Despite a missing specification here, a Scheme programmer can
+      still refer to <code>(srfi 211 syntactic-closures)</code> to
+      write programs that will be portable to most implementations of
+      syntactic closures in practise.</p>
+
+    <p><code>(sc-macro-transformer <var>proc</var>)</code></p>
 
     <p><code>(rsc-macro-transformer <var>proc</var>)</code></p>
 
-    <p><i>TBD</i></p>
+    <p><code>(make-syntactic-closure <var>environment</var> <var>free-names</var> <var>form</var>)</code></p>
 
-    <h4>Syntactic closures</h4>
+    <p><code>(close-syntax <var>form</var> <var>environment</var>)</code></p>
 
-    <p><code>make-syntactic-closure</code></p>
+    <p><code>(capture-syntactic-environment <var>proc</var>)</code></p>
 
-    <p><i>TBD</i></p>
+    <p><code>(sc-identifier=? <var>obj</var>)</code></p>
 
-    <p><code>close-syntax</code></p>
-
-    <p><i>TBD</i></p>
-
-    <p><code>capture-syntactic-environment</code></p>
-
-    <p><i>TBD</i></p>
-
-    <p><code>sc-identifier=?</code></p>
-
-    <p><i>TBD</i></p>
-
-    <p><code>make-synthetic-identifier</code></p>
-
-    <p><i>TBD</i></p>
+    <p><code>(make-synthetic-identifier <var>identifier</var>)</code></p>
 
     <h3>Syntax</h3>
 
