@@ -816,8 +816,9 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI surfboard logo"
     solve <em>this</em> problem.</p>
 
     <pre><small>    (define-syntax foo
-      (er-macro-transformer (x r c)
-        `(,(r loop) (exit ,(cadr x)))))</small></pre>
+      (er-macro-transformer
+        (lambda (x r c)
+          `(,(r loop) (exit ,(cadr x))))))</small></pre>
 
     <p>This rewrite does not solve another problem, however.  The
     expression</p>
