@@ -8,7 +8,9 @@ keywords: [[https://srfi.schemers.org/?keywords=syntax][Syntax]]
 
 This repository hosts [[https://srfi.schemers.org/srfi-211/][SRFI 211]]: Scheme Macro Libraries, a [[https://srfi.schemers.org/][Scheme Request for Implementation]].
 
-This SRFI is in /draft/ status.
+This SRFI is in /final/ status.
+
+See also [[https://srfi.schemers.org/srfi-46/][SRFI 46: Basic Syntax-rules Extensions]], [[https://srfi.schemers.org/srfi-93/][SRFI 93: R6RS Syntax-Case Macros]], and [[https://srfi.schemers.org/srfi-139/][SRFI 139: Syntax parameters]].
 
 The full documentation for this SRFI can be found in the [[https://srfi.schemers.org/srfi-211/srfi-211.html][SRFI Document]].
 
