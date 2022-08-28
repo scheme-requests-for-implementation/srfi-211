@@ -44,7 +44,10 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI surfboard logo"
       <li>Draft #2 published: 2020-09-24</li>
       <li>Draft #3 published: 2020-09-28</li>
       <li>Draft #4 published: 2021-07-25</li>
-      <li>Finalized: 2022-07-19</li></ul>
+      <li>Finalized: 2022-07-19</li>
+      <li>Revised to fix errata:
+      <ul>
+        <li>2022-08-28 (Fixed <a href="#errata-1">typo</a>.)</li></ul></li></ul>
 
     <h2 id="abstract">Abstract</h2>
 
@@ -805,13 +808,13 @@ src="https://srfi.schemers.org/srfi-logo.svg" alt="SRFI surfboard logo"
       capture the binding of the identifier <code>exit</code>
       introduced by the <code>loop</code> macro.</p>
 
-    <p>The following rewrite of <code>foo</code> will
+    <p id="errata-1">The following rewrite of <code>foo</code> will
     solve <em>this</em> problem.</p>
 
     <pre><small>    (define-syntax foo
       (er-macro-transformer
         (lambda (x r c)
-          `(,(r loop) (exit ,(cadr x))))))</small></pre>
+          `(,(r 'loop) (exit ,(cadr x))))))</small></pre>
 
     <p>This rewrite does not solve another problem, however.  The
     expression</p>
